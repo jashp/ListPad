@@ -7,12 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class AllChecklists extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ChecklistManager.initChecklists();
     }
 
     @Override
@@ -25,6 +26,7 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.create_checklist:
+            	EditChecklist.newInstance(this, ChecklistManager.numChecklists());
             	startActivity(new Intent(this, EditChecklist.class));
                 return true;
             default:

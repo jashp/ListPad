@@ -3,13 +3,13 @@ package com.jpqr.checklist;
 import java.util.ArrayList;
 
 public class ChecklistManager {
-	public static ArrayList<Checklist> mChecklists;
+	private static ArrayList<Checklist> mChecklists;
 
 	public static ArrayList<Checklist> getChecklists() {
 		return mChecklists;
-	}
+	}	
 
-	public static void resetChecklists() {
+	public static void initChecklists() {
 		mChecklists = new ArrayList<Checklist>();
 	}
 
@@ -24,5 +24,10 @@ public class ChecklistManager {
 	public static void removeChecklist(int index) {
 		mChecklists.remove(index);
 	}
+	
+	public static void editChecklist(Checklist checklist) {
+		
+	}
+	
 
 }
