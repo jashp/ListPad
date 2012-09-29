@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class ChecklistAdapter extends ArrayAdapter<String> {
@@ -26,7 +26,7 @@ public class ChecklistAdapter extends ArrayAdapter<String> {
 		TextView itemName = (TextView) view.findViewById(R.id.item_name);
 		itemName.setText(mChecklist.get(position));
 		
-		Button removeButton = (Button) view.findViewById(R.id.remove_button);
+		ImageButton removeButton = (ImageButton) view.findViewById(R.id.remove_button);
 		removeButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				mChecklist.remove(position);

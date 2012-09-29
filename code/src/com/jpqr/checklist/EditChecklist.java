@@ -1,6 +1,8 @@
 package com.jpqr.checklist;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,16 +20,15 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class EditChecklist extends Activity {
-	public static final String EXTRA_ID = "ID";
+	public static final String EXTRA_NAME = "NAME";
 	
 	private ArrayAdapter<String> mAdapter;
 	private EditText mAddItemField;
 	private Checklist mChecklist;
-	private int mChecklistId;
 	
-	public static void newInstance(Context context, int checklistId) {
+	public static void newInstance(Context context, String name) {
 		Intent intent = new Intent(context, EditChecklist.class);
-		intent.putExtra(EXTRA_ID, checklistId);
+		intent.putExtra(EXTRA_NAME, name);
 		context.startActivity(intent);
 	}
 	
@@ -35,13 +36,19 @@ public class EditChecklist extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.edit_checklist);
-		mChecklistId = getIntent().getIntExtra(EXTRA_ID, -1);
+		String fileName = getIntent().getStringExtra(EXTRA_NAME);
 		
-		if (mChecklistId < ChecklistManager.numChecklists()) {
-			mChecklist = ChecklistManager.getChecklist(mChecklistId);
-		} else {
-			mChecklist = new Checklist("", new ArrayList<String>());
-		}	
+		File file = new File(Checklist.DIRECTORY_PATH + fileName);
+		
+		try {
+			mChecklist = new Checklist(file);
+		} catch (FileNotFoundException e) {
+			Toast.makeText(this, "File not found", Toast.LENGTH_LONG).show();
+			e.printStackTrace();
+		} catch (IOException e) {
+			Toast.makeText(this, "Input/output problem", Toast.LENGTH_LONG).show();
+			e.printStackTrace();
+		}
 		
 		ListView listView = (ListView) findViewById(R.id.checklist_items);
 
