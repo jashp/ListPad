@@ -4,7 +4,7 @@
         android:orderInCategory="100"
         android:showAsAction="never" />
     <item android:id="@+id/create_checklist"
-        android:icon="@android:drawable/btn_plus"
+        android:icon="@android:drawable/ic_input_add"
         android:orderInCategory="100"
         android:showAsAction="always" />
 </menu>

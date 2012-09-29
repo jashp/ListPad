@@ -4,19 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <TextView
+    <EditText
+        style="@android:style/Widget.Holo.TextView"
         android:id="@+id/item_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true" 
+        android:layout_toLeftOf="@+id/remove_button" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/remove_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@android:drawable/btn_minus" />
+        android:src="@android:drawable/ic_delete" />
 
 </RelativeLayout>

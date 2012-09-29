@@ -1,6 +1,7 @@
 package com.jpqr.checklist;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,10 +22,10 @@ public class AllChecklists extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_checklists);
         
-        File dir = new File(Checklist.DIRECTORY_PATH);
-        File[] files = dir.listFiles();
+        File dir = new File(Checklist.DEFAULT_DIRECTORY);
+        final File[] files = dir.listFiles();
        
-        final String[] fileNames = new String[files.length];
+        String[] fileNames = new String[files.length];
         for(int i = 0; i < files.length; i++) {
         	fileNames[i] = files[i].getName();
         }
@@ -35,10 +36,16 @@ public class AllChecklists extends Activity {
 		
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				EditChecklist.newInstance(AllChecklists.this, fileNames[position]);
+				EditChecklist.newInstance(AllChecklists.this, files[position].getPath());
 			}
 		});
-        
+
+    }
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	
     }
 
     @Override
