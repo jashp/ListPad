@@ -40,7 +40,11 @@ public class Checklist {
 
 
 	public void toFile() throws IOException {
-		mFile.renameTo(new File(mFile.getParentFile().getPath(), mTitle));
+		if (!mTitle.equals(mFile.getName())) {
+			File newFile = new File(mFile.getParentFile().getPath(), mTitle);
+			mFile.renameTo(newFile);
+			mFile = newFile;
+		}		
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(mFile));
 		for (String item : mItems) {
