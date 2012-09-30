@@ -7,8 +7,4 @@
         android:icon="@android:drawable/ic_input_add"
         android:orderInCategory="101"
         android:showAsAction="always" />
-    <item android:id="@+id/refresh_checklists"
-        android:icon="@android:drawable/ic_btn_speak_now"
-        android:orderInCategory="102"
-        android:showAsAction="always" />
 </menu>

@@ -61,9 +61,6 @@ public class AllChecklists extends Activity {
             	EditChecklist.newInstance(this, null);
             	refreshChecklists();
                 return true;
-            case R.id.refresh_checklists:
-           
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

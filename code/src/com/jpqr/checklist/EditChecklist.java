@@ -30,6 +30,7 @@ public class EditChecklist extends Activity {
 	private ArrayAdapter<String> mAdapter;
 	private Checklist mChecklist;
 	private String mPath;
+	private boolean mChanged = false;
 
 	private EditText mChecklistNameField;
 
