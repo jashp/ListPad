@@ -19,17 +19,16 @@ public class Checklist {
 	private ArrayList<String> mItems;
 	private File mFile;
 
-	public Checklist(String title, ArrayList<String> items) {
-		this.mTitle = title;
-		this.mItems = items;
-		this.mFile = null;
+	public Checklist() {
+		this.mTitle = "";
+		this.mItems = new ArrayList<String>();
+		this.mFile = new File(DEFAULT_DIRECTORY, "untitled.txt");
 	}
 
 	public Checklist(String path) throws IOException, FileNotFoundException {
 		this.mFile = new File(path);
 		this.mTitle = mFile.getName();
 		this.mItems = new ArrayList<String>();
-		
 
 		BufferedReader reader = new BufferedReader(new FileReader(mFile));
 		String line;
@@ -39,12 +38,9 @@ public class Checklist {
 		reader.close();
 	}
 
+
 	public void toFile() throws IOException {
-		if (mFile == null) {
-			mFile = new File(DEFAULT_DIRECTORY, mTitle);
-		} else {
-			mFile.renameTo(new File(mFile.getParentFile().getPath(), mTitle));
-		}
+		mFile.renameTo(new File(mFile.getParentFile().getPath(), mTitle));
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(mFile));
 		for (String item : mItems) {

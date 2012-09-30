@@ -20,44 +20,49 @@ import android.widget.Toast;
 
 public class EditChecklist extends Activity {
 	public static final String EXTRA_PATH = "PATH";
-	
+
 	private ArrayAdapter<String> mAdapter;
 	private Checklist mChecklist;
 	private String mPath;
 
 	private EditText mChecklistNameField;
-	
+
 	public static void newInstance(Context context, String path) {
 		Intent intent = new Intent(context, EditChecklist.class);
 		intent.putExtra(EXTRA_PATH, path);
 		context.startActivity(intent);
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.edit_checklist);
 		mPath = getIntent().getStringExtra(EXTRA_PATH);
-		try {
-			mChecklist = new Checklist(mPath);
-		} catch (FileNotFoundException e) {
-			Toast.makeText(this, "File not found.", Toast.LENGTH_LONG).show();
-			e.printStackTrace();
-		} catch (IOException e) {
-			Toast.makeText(this, "Input/output problem.", Toast.LENGTH_LONG).show();
-			e.printStackTrace();
+
+		if (mPath == null) {
+			mChecklist = new Checklist();
+		} else {
+			try {
+				mChecklist = new Checklist(mPath);
+			} catch (FileNotFoundException e) {
+				Toast.makeText(this, "File not found.", Toast.LENGTH_LONG).show();
+				e.printStackTrace();
+			} catch (IOException e) {
+				Toast.makeText(this, "Input/output problem.", Toast.LENGTH_LONG).show();
+				e.printStackTrace();
+			}
 		}
-		
+
 		ListView listView = (ListView) findViewById(R.id.checklist_items);
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		
+
 		View addItemView = inflater.inflate(R.layout.checklist_new_item, null);
 		listView.addFooterView(addItemView);
-		
+
 		mAdapter = new ChecklistAdapter(this, R.layout.checklist_edit_item, mChecklist);
 		listView.setAdapter(mAdapter);
-		
+
 		ImageView addButton = (ImageView) findViewById(R.id.add_button);
 		addButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -70,10 +75,10 @@ public class EditChecklist extends Activity {
 				}
 			}
 		});
-		
+
 		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
 		mChecklistNameField.setText(mChecklist.getTitle());
-		
+
 	}
 
 	@Override
@@ -100,6 +105,5 @@ public class EditChecklist extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-
 
 }

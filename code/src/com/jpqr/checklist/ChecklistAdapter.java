@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 public class ChecklistAdapter extends ArrayAdapter<String> {
-	Checklist mChecklist;
+	private Checklist mChecklist;
 	public ChecklistAdapter(Context context, int textViewResourceId, Checklist checklist) {
 		super(context, textViewResourceId, checklist.getItems());
 		mChecklist = checklist;

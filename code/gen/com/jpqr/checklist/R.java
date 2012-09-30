@@ -28,8 +28,9 @@ public final class R {
         public static final int create_checklist=0x7f080008;
         public static final int item_name=0x7f080001;
         public static final int menu_settings=0x7f080007;
+        public static final int refresh_checklists=0x7f080009;
         public static final int remove_button=0x7f080002;
-        public static final int save=0x7f080009;
+        public static final int save=0x7f08000a;
     }
     public static final class layout {
         public static final int all_checklists=0x7f030000;
