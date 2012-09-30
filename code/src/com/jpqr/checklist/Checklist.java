@@ -44,7 +44,7 @@ public class Checklist {
 			File newFile = new File(mFile.getParentFile().getPath(), mTitle);
 			mFile.renameTo(newFile);
 			mFile = newFile;
-		}		
+		}
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(mFile));
 		for (String item : mItems) {
@@ -88,4 +88,11 @@ public class Checklist {
 	public boolean remove(String item) {
 		return mItems.remove(item);
 	}
+
+	public void delete() {
+		mFile.delete();
+		mTitle = null;
+		mItems = null;
+	}
+
 }

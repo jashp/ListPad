@@ -24,6 +24,7 @@ public class ChecklistAdapter extends ArrayAdapter<String> {
 		}
 		EditText itemName = (EditText) view.findViewById(R.id.item_name);
 		itemName.setText(mChecklist.get(position));
+
 		
 		ImageView removeButton = (ImageView) view.findViewById(R.id.remove_button);
 		removeButton.setOnClickListener(new OnClickListener() {

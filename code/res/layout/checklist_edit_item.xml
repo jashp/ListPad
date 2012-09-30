@@ -5,13 +5,14 @@
     android:orientation="horizontal" >
 
     <EditText
-        style="@android:style/Widget.Holo.TextView"
         android:id="@+id/item_name"
+        style="@android:style/Widget.Holo.TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true" 
-        android:layout_toLeftOf="@+id/remove_button" />
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/remove_button"/>
+
 
     <ImageView
         android:id="@+id/remove_button"

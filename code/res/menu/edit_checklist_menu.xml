@@ -4,4 +4,9 @@
         android:orderInCategory="100"
         android:showAsAction="withText|always"
          />
+    <item android:id="@+id/delete"
+        android:title="Delete"
+        android:orderInCategory="100"
+        android:showAsAction="withText|always"
+         />
 </menu>
