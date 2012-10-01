@@ -3,8 +3,8 @@ package com.jpqr.checklist;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
@@ -24,13 +25,12 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-public class EditChecklist extends Activity {
+public class EditChecklist extends ListActivity {
 	public static final String EXTRA_PATH = "PATH";
 
 	private ArrayAdapter<String> mAdapter;
 	private Checklist mChecklist;
 	private String mPath;
-	private boolean mChanged = false;
 
 	private EditText mChecklistNameField;
 
@@ -45,7 +45,6 @@ public class EditChecklist extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.edit_checklist);
 		mPath = getIntent().getStringExtra(EXTRA_PATH);
 
 		if (mPath == null) {
@@ -62,14 +61,19 @@ public class EditChecklist extends Activity {
 			}
 		}
 
-		ListView listView = (ListView) findViewById(R.id.checklist_items);
+		ListView listView = getListView();
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		View addItemView = inflater.inflate(R.layout.checklist_new_item, null);
 		listView.addFooterView(addItemView);
 
-		mAdapter = new ChecklistAdapter(this, R.layout.checklist_edit_item, mChecklist);
+		View editNameView = inflater.inflate(R.layout.checklist_edit_name, null);
+		listView.addHeaderView(editNameView);
+		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
+		mChecklistNameField.setText(mChecklist.getTitle());
+		
+		mAdapter = new ChecklistAdapter(this, R.layout.checklist_edit_item);
 		listView.setAdapter(mAdapter);
 
 		mAddItemField = (EditText) findViewById(R.id.add_item_field);
@@ -88,11 +92,6 @@ public class EditChecklist extends Activity {
 				addToChecklist();
 			}
 		});
-		
-
-		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
-		mChecklistNameField.setText(mChecklist.getTitle());
-
 	}
 
 	private void addToChecklist() {
@@ -160,6 +159,32 @@ public class EditChecklist extends Activity {
 	public static boolean isFilenameValid(String fileName) {
 		//TODO implement logic
 		return true;
+	}
+	
+	public class ChecklistAdapter extends ArrayAdapter<String> {
+		public ChecklistAdapter(Context context, int textViewResourceId) {
+			super(context, textViewResourceId, mChecklist.getItems());
+		}
+
+		@Override
+		public View getView(final int position, View view, ViewGroup parent) {
+			if (view == null) {
+				LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				view = inflater.inflate(R.layout.checklist_edit_item, null);
+			}
+			TextView itemName = (TextView) view.findViewById(R.id.item_name);
+			itemName.setText(mChecklist.get(position));
+
+			ImageView removeButton = (ImageView) view.findViewById(R.id.remove_button);
+			removeButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					mChecklist.remove(position);
+					notifyDataSetChanged();
+				}
+			});
+			
+			return view;
+		}
 	}
 
 }

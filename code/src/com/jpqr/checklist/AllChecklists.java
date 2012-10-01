@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,20 +18,18 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class AllChecklists extends Activity {
+public class AllChecklists extends ListActivity {
 	private ArrayList<File> mFiles = new ArrayList<File>();
 	private FileListAdapter mAdapter;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.all_checklists);
         
         mAdapter = new FileListAdapter();
         
-		ListView listView = (ListView) findViewById(R.id.all_checklist_list);
+		ListView listView = getListView();
 		listView.setAdapter(mAdapter);
 		
 		listView.setOnItemClickListener(new OnItemClickListener() {
