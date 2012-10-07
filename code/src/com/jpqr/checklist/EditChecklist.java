@@ -2,6 +2,7 @@ package com.jpqr.checklist;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -14,8 +15,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -25,10 +26,15 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
+import com.jpqr.dragdrop.DragDropListView;
+import com.jpqr.dragdrop.DragDropListView.DragListener;
+import com.jpqr.dragdrop.DragDropListView.DropListener;
+import com.jpqr.dragdrop.DragDropListView.RemoveListener;
+
 public class EditChecklist extends ListActivity {
 	public static final String EXTRA_PATH = "PATH";
-
-	private ArrayAdapter<String> mAdapter;
+	private final int NUM_FOOTER = 1;
+	private ChecklistAdapter mAdapter;
 	private Checklist mChecklist;
 	private String mPath;
 
@@ -61,6 +67,7 @@ public class EditChecklist extends ListActivity {
 			}
 		}
 
+		setContentView(R.layout.edit_checklist_activity);
 		ListView listView = getListView();
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -68,11 +75,9 @@ public class EditChecklist extends ListActivity {
 		View addItemView = inflater.inflate(R.layout.checklist_new_item, null);
 		listView.addFooterView(addItemView);
 
-		View editNameView = inflater.inflate(R.layout.checklist_edit_name, null);
-		listView.addHeaderView(editNameView);
 		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
 		mChecklistNameField.setText(mChecklist.getTitle());
-		
+
 		mAdapter = new ChecklistAdapter(this, R.layout.checklist_edit_item);
 		listView.setAdapter(mAdapter);
 
@@ -81,17 +86,23 @@ public class EditChecklist extends ListActivity {
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_NEXT) {
 					addToChecklist();
-			        return true;    
-			    }
+					return true;
+				}
 				return false;
 			}
-		});		
+		});
 		ImageView addButton = (ImageView) findViewById(R.id.add_button);
 		addButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				addToChecklist();
 			}
 		});
+
+		if (listView instanceof DragDropListView) {
+			((DragDropListView) listView).setDropListener(mDropListener);
+			((DragDropListView) listView).setRemoveListener(mRemoveListener);
+			((DragDropListView) listView).setDragListener(mDragListener);
+		}
 	}
 
 	private void addToChecklist() {
@@ -122,7 +133,7 @@ public class EditChecklist extends ListActivity {
 				} else {
 					Toast.makeText(this, "The checklist name is not valid.", Toast.LENGTH_LONG).show();
 				}
-				
+
 			} catch (IOException e) {
 				Toast.makeText(this, "Problem saving file.", Toast.LENGTH_LONG).show();
 				e.printStackTrace();
@@ -149,21 +160,70 @@ public class EditChecklist extends ListActivity {
 			builder.setPositiveButton("Yes", dialogClickListener);
 			builder.setNegativeButton("No", dialogClickListener).show();
 
-			
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	public static boolean isFilenameValid(String fileName) {
-		//TODO implement logic
+		// TODO implement logic
 		return true;
 	}
-	
-	public class ChecklistAdapter extends ArrayAdapter<String> {
+
+	private DropListener mDropListener = new DropListener() {
+		public void onDrop(int from, int to) {
+			if (to > 0 && to < mChecklist.size() - NUM_FOOTER) {
+				ArrayList<String> list = mChecklist.getList();
+				String temp = list.get(from);
+				list.remove(from);
+				list.add(to, temp);
+				getListView().invalidateViews();
+			}
+		}
+	};
+
+	private RemoveListener mRemoveListener = new RemoveListener() {
+		public void onRemove(int which) {
+			if (which > 0 && which < mChecklist.size() - NUM_FOOTER) {
+				mChecklist.remove(which);
+				getListView().invalidateViews();
+			}
+		}
+	};
+
+	private DragListener mDragListener = new DragListener() {
+
+		int backgroundColor = 0xe0103010;
+		int defaultBackgroundColor;
+
+		public void onDrag(int x, int y, ListView listView) {
+			// TODO Auto-generated method stub
+		}
+
+		public void onStartDrag(View itemView) {
+			itemView.setVisibility(View.INVISIBLE);
+			defaultBackgroundColor = itemView.getDrawingCacheBackgroundColor();
+			itemView.setBackgroundColor(backgroundColor);
+			ImageView iv = (ImageView) itemView.findViewById(R.id.ImageView01);
+			if (iv != null)
+				iv.setVisibility(View.INVISIBLE);
+		}
+
+		public void onStopDrag(View itemView) {
+			itemView.setVisibility(View.VISIBLE);
+			itemView.setBackgroundColor(defaultBackgroundColor);
+			ImageView iv = (ImageView) itemView.findViewById(R.id.ImageView01);
+			if (iv != null)
+				iv.setVisibility(View.VISIBLE);
+		}
+
+	};
+
+	public final class ChecklistAdapter extends ArrayAdapter<String> {
+
 		public ChecklistAdapter(Context context, int textViewResourceId) {
-			super(context, textViewResourceId, mChecklist.getItems());
+			super(context, textViewResourceId, mChecklist.getList());
 		}
 
 		@Override
@@ -173,16 +233,17 @@ public class EditChecklist extends ListActivity {
 				view = inflater.inflate(R.layout.checklist_edit_item, null);
 			}
 			TextView itemName = (TextView) view.findViewById(R.id.item_name);
-			itemName.setText(mChecklist.get(position));
-
 			ImageView removeButton = (ImageView) view.findViewById(R.id.remove_button);
-			removeButton.setOnClickListener(new OnClickListener() {
+			OnClickListener onClickListener = new OnClickListener() {
 				public void onClick(View v) {
 					mChecklist.remove(position);
 					notifyDataSetChanged();
 				}
-			});
-			
+			};
+
+			itemName.setText(mChecklist.get(position));
+			removeButton.setOnClickListener(onClickListener);
+
 			return view;
 		}
 	}

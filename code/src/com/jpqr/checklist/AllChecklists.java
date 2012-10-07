@@ -1,6 +1,7 @@
 package com.jpqr.checklist;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -66,9 +67,30 @@ public class AllChecklists extends ListActivity {
     
     private void refreshChecklists() {
     	File dir = new File(Checklist.DEFAULT_DIRECTORY);
+    	
+    	if (!dir.isDirectory()) {
+    		boolean bool = dir.mkdirs();
+    		
+    		try {
+				Checklist sample = new Checklist();
+				sample.setTitle("groceries.txt");
+				sample.add("milk");
+				sample.add("eggs");
+				sample.add("bread");
+				sample.add("ice cream");
+				sample.add("apples");
+				sample.add("bananas");
+				sample.makeFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	} 
+    	
     	mFiles.clear();
-        mFiles.addAll(Arrays.asList(dir.listFiles()));
+    	File[] files = dir.listFiles();
+        mFiles.addAll(Arrays.asList(files));
     	mAdapter.notifyDataSetChanged();
+ 
     }
     
     public boolean checkExternalStorage() {
