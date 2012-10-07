@@ -26,17 +26,14 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import com.jpqr.dragdrop.DragDropListView;
-import com.jpqr.dragdrop.DragDropListView.DragListener;
-import com.jpqr.dragdrop.DragDropListView.DropListener;
-import com.jpqr.dragdrop.DragDropListView.RemoveListener;
+import com.jpqr.dragdrop.TouchInterceptor;
 
 public class EditChecklist extends ListActivity {
 	public static final String EXTRA_PATH = "PATH";
-	private final int NUM_FOOTER = 1;
 	private ChecklistAdapter mAdapter;
 	private Checklist mChecklist;
 	private String mPath;
+	private ListView mListView;
 
 	private EditText mChecklistNameField;
 
@@ -68,18 +65,20 @@ public class EditChecklist extends ListActivity {
 		}
 
 		setContentView(R.layout.edit_checklist_activity);
-		ListView listView = getListView();
+		mListView = getListView();
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
+		((TouchInterceptor) mListView).setDropListener(mDropListener);
 
 		View addItemView = inflater.inflate(R.layout.checklist_new_item, null);
-		listView.addFooterView(addItemView);
+		mListView.addFooterView(addItemView);
 
 		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
 		mChecklistNameField.setText(mChecklist.getTitle());
 
 		mAdapter = new ChecklistAdapter(this, R.layout.checklist_edit_item);
-		listView.setAdapter(mAdapter);
+		mListView.setAdapter(mAdapter);
 
 		mAddItemField = (EditText) findViewById(R.id.add_item_field);
 		mAddItemField.setOnEditorActionListener(new OnEditorActionListener() {
@@ -97,12 +96,19 @@ public class EditChecklist extends ListActivity {
 				addToChecklist();
 			}
 		});
+	}
 
-		if (listView instanceof DragDropListView) {
-			((DragDropListView) listView).setDropListener(mDropListener);
-			((DragDropListView) listView).setRemoveListener(mRemoveListener);
-			((DragDropListView) listView).setDragListener(mDragListener);
-		}
+	@Override
+	public void onDestroy() {
+		((TouchInterceptor) mListView).setDropListener(null);
+		setListAdapter(null);
+		super.onDestroy();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		mListView.invalidateViews();
 	}
 
 	private void addToChecklist() {
@@ -171,60 +177,37 @@ public class EditChecklist extends ListActivity {
 		return true;
 	}
 
-	private DropListener mDropListener = new DropListener() {
-		public void onDrop(int from, int to) {
-			if (to > 0 && to < mChecklist.size() - NUM_FOOTER) {
-				ArrayList<String> list = mChecklist.getList();
-				String temp = list.get(from);
-				list.remove(from);
-				list.add(to, temp);
-				getListView().invalidateViews();
-			}
+	private TouchInterceptor.DropListener mDropListener = new TouchInterceptor.DropListener() {
+		public void drop(int from, int to) {
+			ArrayList<String> list = mChecklist.getList();
+			int size = list.size();
+			if (from < size) {
+				if (to >= size) {
+					to = size - 1;
+				}
+				String item = list.remove(from);
+				list.add(to, item);
+				mListView.invalidateViews();
+			} 
 		}
-	};
-
-	private RemoveListener mRemoveListener = new RemoveListener() {
-		public void onRemove(int which) {
-			if (which > 0 && which < mChecklist.size() - NUM_FOOTER) {
-				mChecklist.remove(which);
-				getListView().invalidateViews();
-			}
-		}
-	};
-
-	private DragListener mDragListener = new DragListener() {
-
-		int backgroundColor = 0xe0103010;
-		int defaultBackgroundColor;
-
-		public void onDrag(int x, int y, ListView listView) {
-			// TODO Auto-generated method stub
-		}
-
-		public void onStartDrag(View itemView) {
-			itemView.setVisibility(View.INVISIBLE);
-			defaultBackgroundColor = itemView.getDrawingCacheBackgroundColor();
-			itemView.setBackgroundColor(backgroundColor);
-			ImageView iv = (ImageView) itemView.findViewById(R.id.ImageView01);
-			if (iv != null)
-				iv.setVisibility(View.INVISIBLE);
-		}
-
-		public void onStopDrag(View itemView) {
-			itemView.setVisibility(View.VISIBLE);
-			itemView.setBackgroundColor(defaultBackgroundColor);
-			ImageView iv = (ImageView) itemView.findViewById(R.id.ImageView01);
-			if (iv != null)
-				iv.setVisibility(View.VISIBLE);
-		}
-
 	};
 
 	public final class ChecklistAdapter extends ArrayAdapter<String> {
-
 		public ChecklistAdapter(Context context, int textViewResourceId) {
 			super(context, textViewResourceId, mChecklist.getList());
 		}
+		
+		public int getCount() {
+            return mChecklist.size();
+        }
+
+        public String getItem(int position) {
+            return mChecklist.getList().get(position);
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
 
 		@Override
 		public View getView(final int position, View view, ViewGroup parent) {

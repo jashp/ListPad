@@ -25,6 +25,7 @@
             android:name=".EditChecklist"
             android:label="Edit Checklist" >
         </activity>
+         
     </application>
 
 </manifest>
