@@ -1,6 +1,5 @@
 package com.jpqr.checklist;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -133,7 +132,7 @@ public class EditChecklist extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.save:
-				if(save()) {
+				if (save()) {
 					finish();
 				}
 				return true;
@@ -165,12 +164,12 @@ public class EditChecklist extends ListActivity {
 
 	private boolean save() {
 		String fileName = mChecklistNameField.getText().toString().trim();
-		
+
 		if (!isFilenameValid(fileName)) {
 			Toast.makeText(this, "The list name is not valid.", Toast.LENGTH_LONG).show();
 			return false;
 		}
-		
+
 		mChecklist.setTitle(fileName);
 		try {
 			mChecklist.toFile();
@@ -188,7 +187,7 @@ public class EditChecklist extends ListActivity {
 
 	private TouchInterceptor.DropListener mDropListener = new TouchInterceptor.DropListener() {
 		public void drop(int from, int to) {
-			ArrayList<String> list = mChecklist.getList();
+			ArrayList<String> list = mChecklist;
 			int size = list.size();
 			if (from < size) {
 				if (to >= size) {
@@ -204,7 +203,7 @@ public class EditChecklist extends ListActivity {
 	public final class ChecklistAdapter extends ArrayAdapter<String> {
 
 		public ChecklistAdapter(Context context, int textViewResourceId) {
-			super(context, textViewResourceId, mChecklist.getList());
+			super(context, textViewResourceId, mChecklist);
 		}
 
 		public int getCount() {
@@ -212,7 +211,7 @@ public class EditChecklist extends ListActivity {
 		}
 
 		public String getItem(int position) {
-			return mChecklist.getList().get(position);
+			return mChecklist.get(position);
 		}
 
 		public long getItemId(int position) {

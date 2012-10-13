@@ -80,7 +80,7 @@ public class AllChecklists extends ListActivity {
 				sample.add("ice cream");
 				sample.add("apples");
 				sample.add("bananas");
-				sample.makeFile();
+				sample.toFile();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

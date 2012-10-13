@@ -8,32 +8,29 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import android.os.Environment;
 
-public class Checklist {
+public class Checklist extends ArrayList<String> {
 
+	private static final long serialVersionUID = -4776403069516340972L;
 	public static final String DEFAULT_DIRECTORY = Environment.getExternalStorageDirectory().toString() + "/Checklists/";
 	private String mTitle;
-	private ArrayList<String> mItems;
 	private File mFile;
 
 	public Checklist() {
 		this.mTitle = "";
-		this.mItems = new ArrayList<String>();
 		this.mFile = new File(DEFAULT_DIRECTORY, "untitled.txt");
 	}
 
 	public Checklist(String path) throws IOException, FileNotFoundException {
 		this.mFile = new File(path);
 		this.mTitle = mFile.getName();
-		this.mItems = new ArrayList<String>();
 
 		BufferedReader reader = new BufferedReader(new FileReader(mFile));
 		String line;
 		while ((line = reader.readLine()) != null) {
-			mItems.add(line);
+			add(line);
 		}
 		reader.close();
 	}
@@ -46,32 +43,23 @@ public class Checklist {
 		}
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(mFile));
-		for (String item : mItems) {
-			writer.write(item + "\r\n");
-		}
-		writer.close();
-	}
-
-	public void makeFile() throws IOException {
-		File mFile = new File(DEFAULT_DIRECTORY, mTitle);
-		mFile.createNewFile();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(mFile));
-		for (String item : mItems) {
+		ArrayList<String> list = getList();
+		for (String item : list) {
 			writer.write(item + "\r\n");
 		}
 		writer.close();
 	}
 
 	public ArrayList<String> getList() {
-		return mItems;
+		return (ArrayList<String>) this;
 	}
 
-	public void setItems(ArrayList<String> items) {
-		this.mItems = items;
-	}
-
-	public void setItems(String items) {
-		this.mItems = new ArrayList<String>(Arrays.asList(items.split("\r\n")));
+	public void fromString(String items) {
+		String[] itemsArray = items.split("\r\n");
+		ArrayList<String> list = getList();
+		for (String item : itemsArray) {
+			list.add(item);
+		}
 	}
 
 	public String getTitle() {
@@ -82,29 +70,8 @@ public class Checklist {
 		this.mTitle = mTitle;
 	}
 
-	public void add(String item) {
-		mItems.add(item);
-	}
-
-	public String get(int index) {
-		return mItems.get(index);
-	}
-
-	public void remove(int index) {
-		mItems.remove(index);
-	}
-
-	public boolean remove(String item) {
-		return mItems.remove(item);
-	}
-
 	public void delete() {
 		mFile.delete();
 		mTitle = null;
-		mItems = null;
-	}
-
-	public int size() {
-		return mItems.size();
 	}
 }
