@@ -38,21 +38,20 @@ public class Checklist {
 		reader.close();
 	}
 
-
 	public void toFile() throws IOException {
 		if (!mTitle.equals(mFile.getName())) {
 			File newFile = new File(mFile.getParentFile().getPath(), mTitle);
 			mFile.renameTo(newFile);
 			mFile = newFile;
 		}
-		
+
 		BufferedWriter writer = new BufferedWriter(new FileWriter(mFile));
 		for (String item : mItems) {
 			writer.write(item + "\r\n");
 		}
 		writer.close();
 	}
-	
+
 	public void makeFile() throws IOException {
 		File mFile = new File(DEFAULT_DIRECTORY, mTitle);
 		mFile.createNewFile();
@@ -104,7 +103,7 @@ public class Checklist {
 		mTitle = null;
 		mItems = null;
 	}
-	
+
 	public int size() {
 		return mItems.size();
 	}

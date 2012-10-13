@@ -1,5 +1,6 @@
 package com.jpqr.checklist;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -68,7 +71,7 @@ public class EditChecklist extends ListActivity {
 		mListView = getListView();
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		
+
 		((TouchInterceptor) mListView).setDropListener(mDropListener);
 
 		View addItemView = inflater.inflate(R.layout.checklist_new_item, null);
@@ -79,6 +82,13 @@ public class EditChecklist extends ListActivity {
 
 		mAdapter = new ChecklistAdapter(this, R.layout.checklist_edit_item);
 		mListView.setAdapter(mAdapter);
+
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Toast.makeText(EditChecklist.this, "Yo", Toast.LENGTH_SHORT).show();
+			}
+		});
 
 		mAddItemField = (EditText) findViewById(R.id.add_item_field);
 		mAddItemField.setOnEditorActionListener(new OnEditorActionListener() {
@@ -99,16 +109,9 @@ public class EditChecklist extends ListActivity {
 	}
 
 	@Override
-	public void onDestroy() {
-		((TouchInterceptor) mListView).setDropListener(null);
-		setListAdapter(null);
-		super.onDestroy();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		mListView.invalidateViews();
+	protected void onPause() {
+		super.onPause();
+		save();
 	}
 
 	private void addToChecklist() {
@@ -129,51 +132,57 @@ public class EditChecklist extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.save:
-			try {
-				String fileName = mChecklistNameField.getText().toString();
-				if (isFilenameValid(fileName)) {
-					mChecklist.setTitle(fileName);
-					mChecklist.toFile();
-					Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
-				} else {
-					Toast.makeText(this, "The checklist name is not valid.", Toast.LENGTH_LONG).show();
+			case R.id.save:
+				if(save()) {
+					finish();
 				}
+				return true;
+			case R.id.delete:
+				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
+							case DialogInterface.BUTTON_POSITIVE:
+								mChecklist.delete();
+								finish();
+							break;
 
-			} catch (IOException e) {
-				Toast.makeText(this, "Problem saving file.", Toast.LENGTH_LONG).show();
-				e.printStackTrace();
-			}
-			finish();
-			return true;
-		case R.id.delete:
-			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					switch (which) {
-					case DialogInterface.BUTTON_POSITIVE:
-						mChecklist.delete();
-						finish();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						break;
+							case DialogInterface.BUTTON_NEGATIVE:
+							break;
+						}
 					}
-				}
-			};
+				};
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Are you sure you want to delete this checklist?");
-			builder.setPositiveButton("Yes", dialogClickListener);
-			builder.setNegativeButton("No", dialogClickListener).show();
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage("Are you sure you want to delete this checklist?");
+				builder.setPositiveButton("Yes", dialogClickListener);
+				builder.setNegativeButton("No", dialogClickListener).show();
 
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private boolean save() {
+		String fileName = mChecklistNameField.getText().toString().trim();
+		
+		if (!isFilenameValid(fileName)) {
+			Toast.makeText(this, "The list name is not valid.", Toast.LENGTH_LONG).show();
+			return false;
+		}
+		
+		mChecklist.setTitle(fileName);
+		try {
+			mChecklist.toFile();
+			Toast.makeText(this, "List saved.", Toast.LENGTH_SHORT).show();
 			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
 		}
 	}
 
 	public static boolean isFilenameValid(String fileName) {
-		// TODO implement logic
 		return true;
 	}
 
@@ -188,26 +197,27 @@ public class EditChecklist extends ListActivity {
 				String item = list.remove(from);
 				list.add(to, item);
 				mListView.invalidateViews();
-			} 
+			}
 		}
 	};
 
 	public final class ChecklistAdapter extends ArrayAdapter<String> {
+
 		public ChecklistAdapter(Context context, int textViewResourceId) {
 			super(context, textViewResourceId, mChecklist.getList());
 		}
-		
+
 		public int getCount() {
-            return mChecklist.size();
-        }
+			return mChecklist.size();
+		}
 
-        public String getItem(int position) {
-            return mChecklist.getList().get(position);
-        }
+		public String getItem(int position) {
+			return mChecklist.getList().get(position);
+		}
 
-        public long getItemId(int position) {
-            return position;
-        }
+		public long getItemId(int position) {
+			return position;
+		}
 
 		@Override
 		public View getView(final int position, View view, ViewGroup parent) {
@@ -230,5 +240,4 @@ public class EditChecklist extends ListActivity {
 			return view;
 		}
 	}
-
 }

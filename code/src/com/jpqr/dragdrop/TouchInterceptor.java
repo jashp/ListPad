@@ -16,7 +16,6 @@
 
 package com.jpqr.dragdrop;
 
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -39,314 +38,310 @@ import com.jpqr.checklist.R;
 
 public class TouchInterceptor extends ListView {
 
-    private ImageView mDragView;
-    private WindowManager mWindowManager;
-    private WindowManager.LayoutParams mWindowParams;
-    private int mDragPos; // which item is being dragged
-    private int mFirstDragPos; // where was the dragged item originally
-    private int mDragPoint; // at what offset inside the item did the user grab
-                            // it
-    private int mCoordOffset; // the difference between screen coordinates and
-                              // coordinates in this view
-    private DragListener mDragListener;
-    private DropListener mDropListener;
-    private int mUpperBound;
-    private int mLowerBound;
-    private int mHeight;
-    private Rect mTempRect = new Rect();
-    private Bitmap mDragBitmap;
-    private final int mTouchSlop;
-    private int mItemHeightNormal;
-    private int mItemHeightExpanded;
-    private int mItemHeightHalf;
-    
-    public TouchInterceptor(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-        Resources res = getResources();
-        mItemHeightNormal = res.getDimensionPixelSize(R.dimen.normal_height);
-        mItemHeightHalf = mItemHeightNormal / 2;
-        mItemHeightExpanded = res.getDimensionPixelSize(R.dimen.expanded_height);
-    }
+	private ImageView mDragView;
+	private WindowManager mWindowManager;
+	private WindowManager.LayoutParams mWindowParams;
+	private int mDragPos; // which item is being dragged
+	private int mFirstDragPos; // where was the dragged item originally
+	private int mDragPoint; // at what offset inside the item did the user grab
+							// it
+	private int mCoordOffset; // the difference between screen coordinates and
+								// coordinates in this view
+	private DragListener mDragListener;
+	private DropListener mDropListener;
+	private int mUpperBound;
+	private int mLowerBound;
+	private int mHeight;
+	private Rect mTempRect = new Rect();
+	private Bitmap mDragBitmap;
+	private final int mTouchSlop;
+	private int mItemHeightNormal;
+	private int mItemHeightExpanded;
+	private int mItemHeightHalf;
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (mDragListener != null || mDropListener != null) {
-            switch (ev.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    int x = (int) ev.getX();
-                    int y = (int) ev.getY();
-                    int itemnum = pointToPosition(x, y);
-                    int count = getCount();
-                    if (itemnum == AdapterView.INVALID_POSITION ){
-                        break;
-                    } 
-                    ViewGroup item = (ViewGroup) getChildAt(itemnum - getFirstVisiblePosition());
-                    mDragPoint = y - item.getTop();
-                    mCoordOffset = ((int) ev.getRawY()) - y;
-                    View dragger = item.findViewById(R.id.ImageView01);
-                    Rect r = mTempRect;
-                    dragger.getDrawingRect(r);
-                    // The dragger icon itself is quite small, so pretend the
-                    // touch area is bigger
-                    if (x < r.right * 2) {
-                        // Create a copy of the drawing cache so that it does
-                        // not get recycled
-                        // by the framework when the list tries to clean up
-                        // memory
-                    	item.setDrawingCacheEnabled(true);
-                        Bitmap bitmap = Bitmap.createBitmap(item.getDrawingCache());
-                        item.setDrawingCacheEnabled(false);
+	public TouchInterceptor(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+		Resources res = getResources();
+		mItemHeightNormal = res.getDimensionPixelSize(R.dimen.normal_height);
+		mItemHeightHalf = mItemHeightNormal / 2;
+		mItemHeightExpanded = res.getDimensionPixelSize(R.dimen.expanded_height);
+	}
 
-                        startDragging(bitmap, y);
-                        mDragPos = itemnum;
-                        mFirstDragPos = mDragPos;
-                        mHeight = getHeight();
-                        int touchSlop = mTouchSlop;
-                        mUpperBound = Math.min(y - touchSlop, mHeight / 3);
-                        mLowerBound = Math.max(y + touchSlop, mHeight * 2 / 3);
-                        return false;
-                    }
-                    stopDragging();
-                    break;
-            }
-        }
-        return super.onInterceptTouchEvent(ev);
-    }
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		if (mDragListener != null || mDropListener != null) {
+			switch (ev.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					int x = (int) ev.getX();
+					int y = (int) ev.getY();
+					int itemnum = pointToPosition(x, y);
+					if (itemnum == AdapterView.INVALID_POSITION || itemnum == getChildCount() - 1) {
+						break;
+					}
+					ViewGroup item = (ViewGroup) getChildAt(itemnum - getFirstVisiblePosition());
+					mDragPoint = y - item.getTop();
+					mCoordOffset = ((int) ev.getRawY()) - y;
+					View dragger = item.findViewById(R.id.ImageView01);
+					Rect r = mTempRect;
+					dragger.getDrawingRect(r);
+					// The dragger icon itself is quite small, so pretend the
+					// touch area is bigger
+					if (x < r.right * 2) {
+						// Create a copy of the drawing cache so that it does
+						// not get recycled
+						// by the framework when the list tries to clean up
+						// memory
+						item.setDrawingCacheEnabled(true);
+						Bitmap bitmap = Bitmap.createBitmap(item.getDrawingCache());
+						item.setDrawingCacheEnabled(false);
 
-    /*
-     * pointToPosition() doesn't consider invisible views, but we need to, so
-     * implement a slightly different version.
-     */
-    private int myPointToPosition(int x, int y) {
+						startDragging(bitmap, y);
+						mDragPos = itemnum;
+						mFirstDragPos = mDragPos;
+						mHeight = getHeight();
+						int touchSlop = mTouchSlop;
+						mUpperBound = Math.min(y - touchSlop, mHeight / 3);
+						mLowerBound = Math.max(y + touchSlop, mHeight * 2 / 3);
+						return false;
+					}
+					stopDragging();
+				break;
+			}
+		}
+		return super.onInterceptTouchEvent(ev);
+	}
 
-        if (y < 0) {
-            // when dragging off the top of the screen, calculate position
-            // by going back from a visible item
-            int pos = myPointToPosition(x, y + mItemHeightNormal);
-            if (pos > 0) {
-                return pos - 1;
-            }
-        }
+	/*
+	 * pointToPosition() doesn't consider invisible views, but we need to, so
+	 * implement a slightly different version.
+	 */
+	private int myPointToPosition(int x, int y) {
 
-        Rect frame = mTempRect;
-        final int count = getChildCount();
-        for (int i = count - 1; i >= 0; i--) {
-            final View child = getChildAt(i);
-            child.getHitRect(frame);
-            if (frame.contains(x, y)) {
-                return getFirstVisiblePosition() + i;
-            }
-        }
-        return INVALID_POSITION;
-    }
+		if (y < 0) {
+			// when dragging off the top of the screen, calculate position
+			// by going back from a visible item
+			int pos = myPointToPosition(x, y + mItemHeightNormal);
+			if (pos > 0) {
+				return pos - 1;
+			}
+		}
 
-    private int getItemForPosition(int y) {
-        int adjustedy = y - mDragPoint - mItemHeightHalf;
-        int pos = myPointToPosition(0, adjustedy);
-        if (pos >= 0) {
-            if (pos <= mFirstDragPos) {
-                pos += 1;
-            }
-        } else if (adjustedy < 0) {
-            // this shouldn't happen anymore now that myPointToPosition deals
-            // with this situation
-            pos = 0;
-        }
-        return pos;
-    }
+		Rect frame = mTempRect;
+		final int count = getChildCount();
+		for (int i = count - 1; i >= 0; i--) {
+			final View child = getChildAt(i);
+			child.getHitRect(frame);
+			if (frame.contains(x, y)) {
+				return getFirstVisiblePosition() + i;
+			}
+		}
+		return INVALID_POSITION;
+	}
 
-    private void adjustScrollBounds(int y) {
-        if (y >= mHeight / 3) {
-            mUpperBound = mHeight / 3;
-        }
-        if (y <= mHeight * 2 / 3) {
-            mLowerBound = mHeight * 2 / 3;
-        }
-    }
+	private int getItemForPosition(int y) {
+		int adjustedy = y - mDragPoint - mItemHeightHalf;
+		int pos = myPointToPosition(0, adjustedy);
+		if (pos >= 0) {
+			if (pos <= mFirstDragPos) {
+				pos += 1;
+			}
+		} else if (adjustedy < 0) {
+			// this shouldn't happen anymore now that myPointToPosition deals
+			// with this situation
+			pos = 0;
+		}
+		return pos;
+	}
 
-    /*
-     * Restore size and visibility for all listitems
-     */
-    private void unExpandViews(boolean deletion) {
-        for (int i = 0;; i++) {
-            View v = getChildAt(i);
-            if (v == null) {
-                break;
-            }
-            ViewGroup.LayoutParams params = v.getLayoutParams();
-            params.height = mItemHeightNormal;
-            v.setLayoutParams(params);
-            v.setVisibility(View.VISIBLE);
-        }
-    }
+	private void adjustScrollBounds(int y) {
+		if (y >= mHeight / 3) {
+			mUpperBound = mHeight / 3;
+		}
+		if (y <= mHeight * 2 / 3) {
+			mLowerBound = mHeight * 2 / 3;
+		}
+	}
 
-    /*
-     * Adjust visibility and size to make it appear as though an item is being
-     * dragged around and other items are making room for it: If dropping the
-     * item would result in it still being in the same place, then make the
-     * dragged listitem's size normal, but make the item invisible. Otherwise,
-     * if the dragged listitem is still on screen, make it as small as possible
-     * and expand the item below the insert point. If the dragged item is not on
-     * screen, only expand the item below the current insertpoint.
-     */
-    private void doExpansion() {
-        int childnum = mDragPos - getFirstVisiblePosition();
-        if (mDragPos > mFirstDragPos) {
-            childnum++;
-        }
+	/*
+	 * Restore size and visibility for all listitems
+	 */
+	private void unExpandViews(boolean deletion) {
+		for (int i = 0;; i++) {
+			View v = getChildAt(i);
+			if (v == null) {
+				break;
+			}
+			ViewGroup.LayoutParams params = v.getLayoutParams();
+			params.height = mItemHeightNormal;
+			v.setLayoutParams(params);
+			v.setVisibility(View.VISIBLE);
+		}
+	}
 
-        View first = getChildAt(mFirstDragPos - getFirstVisiblePosition());
+	/*
+	 * Adjust visibility and size to make it appear as though an item is being
+	 * dragged around and other items are making room for it: If dropping the
+	 * item would result in it still being in the same place, then make the
+	 * dragged listitem's size normal, but make the item invisible. Otherwise,
+	 * if the dragged listitem is still on screen, make it as small as possible
+	 * and expand the item below the insert point. If the dragged item is not on
+	 * screen, only expand the item below the current insertpoint.
+	 */
+	private void doExpansion() {
+		int childnum = mDragPos - getFirstVisiblePosition();
+		if (mDragPos > mFirstDragPos) {
+			childnum++;
+		}
 
-        for (int i = 0;; i++) {
-            View vv = getChildAt(i);
-            if (vv == null) {
-                break;
-            }
-            int height = mItemHeightNormal;
-            int visibility = View.VISIBLE;
-            if (vv.equals(first)) {
-                // processing the item that is being dragged
-                if (mDragPos == mFirstDragPos) {
-                    // hovering over the original location
-                    visibility = View.INVISIBLE;
-                } else {
-                    // not hovering over it
-                    height = 1;
-                }
-            } else if (i == childnum) {
-                if (mDragPos < getCount() - 1) {
-                    height = mItemHeightExpanded;
-                }
-            }
-            ViewGroup.LayoutParams params = vv.getLayoutParams();
-            params.height = height;
-            vv.setLayoutParams(params);
-            vv.setVisibility(visibility);
-        }
-    }
+		View first = getChildAt(mFirstDragPos - getFirstVisiblePosition());
 
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        if ((mDragListener != null || mDropListener != null) && mDragView != null) {
-            int action = ev.getAction();
-            switch (action) {
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    Rect r = mTempRect;
-                    mDragView.getDrawingRect(r);
-                    stopDragging();
-                    if (mDropListener != null && mDragPos >= 0 && mDragPos < getCount()) {
-                        mDropListener.drop(mFirstDragPos, mDragPos);
-                    }
-                    unExpandViews(false);
-                    break;
+		for (int i = 0;; i++) {
+			View vv = getChildAt(i);
+			if (vv == null) {
+				break;
+			}
+			int height = mItemHeightNormal;
+			int visibility = View.VISIBLE;
+			if (vv.equals(first)) {
+				// processing the item that is being dragged
+				if (mDragPos == mFirstDragPos) {
+					// hovering over the original location
+					visibility = View.INVISIBLE;
+				} else {
+					// not hovering over it
+					height = 1;
+				}
+			} else if (i == childnum) {
+				if (mDragPos < getCount() - 1) {
+					height = mItemHeightExpanded;
+				}
+			}
+			ViewGroup.LayoutParams params = vv.getLayoutParams();
+			params.height = height;
+			vv.setLayoutParams(params);
+			vv.setVisibility(visibility);
+		}
+	}
 
-                case MotionEvent.ACTION_DOWN:
-                case MotionEvent.ACTION_MOVE:
-                    int x = (int) ev.getX();
-                    int y = (int) ev.getY();
-                    dragView(x, y);
-                    int itemnum = getItemForPosition(y);
-                    if (itemnum >= 0) {
-                        if (action == MotionEvent.ACTION_DOWN || itemnum != mDragPos) {
-                            if (mDragListener != null) {
-                                mDragListener.drag(mDragPos, itemnum);
-                            }
-                            mDragPos = itemnum;
-                            doExpansion();
-                        }
-                        int speed = 0;
-                        adjustScrollBounds(y);
-                        if (y > mLowerBound) {
-                            // scroll the list up a bit
-                            speed = y > (mHeight + mLowerBound) / 2 ? 16 : 4;
-                        } else if (y < mUpperBound) {
-                            // scroll the list down a bit
-                            speed = y < mUpperBound / 2 ? -16 : -4;
-                        }
-                        if (speed != 0) {
-                            int ref = pointToPosition(0, mHeight / 2);
-                            if (ref == AdapterView.INVALID_POSITION) {
-                                // we hit a divider or an invisible view, check
-                                // somewhere else
-                                ref = pointToPosition(0, mHeight / 2 + getDividerHeight() + 64);
-                            }
-                            View v = getChildAt(ref - getFirstVisiblePosition());
-                            if (v != null) {
-                                int pos = v.getTop();
-                                setSelectionFromTop(ref, pos - speed);
-                            }
-                        }
-                    }
-                    break;
-            }
-            return true;
-        }
-        return super.onTouchEvent(ev);
-    }
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		if ((mDragListener != null || mDropListener != null) && mDragView != null) {
+			int action = ev.getAction();
+			switch (action) {
+				case MotionEvent.ACTION_UP:
+				case MotionEvent.ACTION_CANCEL:
+					Rect r = mTempRect;
+					mDragView.getDrawingRect(r);
+					stopDragging();
+					if (mDropListener != null && mDragPos >= 0 && mDragPos < getCount()) {
+						mDropListener.drop(mFirstDragPos, mDragPos);
+					}
+					unExpandViews(false);
+				break;
 
-    private void startDragging(Bitmap bm, int y) {
-        stopDragging();
+				case MotionEvent.ACTION_DOWN:
+				case MotionEvent.ACTION_MOVE:
+					int x = (int) ev.getX();
+					int y = (int) ev.getY();
+					dragView(x, y);
+					int itemnum = getItemForPosition(y);
+					if (itemnum >= 0) {
+						if (action == MotionEvent.ACTION_DOWN || itemnum != mDragPos) {
+							if (mDragListener != null) {
+								mDragListener.drag(mDragPos, itemnum);
+							}
+							mDragPos = itemnum;
+							doExpansion();
+						}
+						int speed = 0;
+						adjustScrollBounds(y);
+						if (y > mLowerBound) {
+							// scroll the list up a bit
+							speed = y > (mHeight + mLowerBound) / 2 ? 16 : 4;
+						} else if (y < mUpperBound) {
+							// scroll the list down a bit
+							speed = y < mUpperBound / 2 ? -16 : -4;
+						}
+						if (speed != 0) {
+							int ref = pointToPosition(0, mHeight / 2);
+							if (ref == AdapterView.INVALID_POSITION) {
+								// we hit a divider or an invisible view, check
+								// somewhere else
+								ref = pointToPosition(0, mHeight / 2 + getDividerHeight() + 64);
+							}
+							View v = getChildAt(ref - getFirstVisiblePosition());
+							if (v != null) {
+								int pos = v.getTop();
+								setSelectionFromTop(ref, pos - speed);
+							}
+						}
+					}
+				break;
+			}
+			return true;
+		}
+		return super.onTouchEvent(ev);
+	}
 
-        mWindowParams = new WindowManager.LayoutParams();
-        mWindowParams.gravity = Gravity.TOP;
-        mWindowParams.x = 0;
-        mWindowParams.y = y - mDragPoint + mCoordOffset;
+	private void startDragging(Bitmap bm, int y) {
+		stopDragging();
 
-        mWindowParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-        mWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
-        mWindowParams.format = PixelFormat.TRANSLUCENT;
-        mWindowParams.windowAnimations = 0;
+		mWindowParams = new WindowManager.LayoutParams();
+		mWindowParams.gravity = Gravity.TOP;
+		mWindowParams.x = 0;
+		mWindowParams.y = y - mDragPoint + mCoordOffset;
 
-        Context context = getContext();
-        ImageView v = new ImageView(context);
-//        int backGroundColor = context.getResources().getColor(R.color.dragndrop_background);
-//        v.setBackgroundColor(backGroundColor); TODO change color
-        v.setImageBitmap(bm);
-        mDragBitmap = bm;
+		mWindowParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+		mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+		mWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+				| WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+		mWindowParams.format = PixelFormat.TRANSLUCENT;
+		mWindowParams.windowAnimations = 0;
 
-        mWindowManager = (WindowManager) context.getSystemService("window");
-        mWindowManager.addView(v, mWindowParams);
-        mDragView = v;
-    }
+		Context context = getContext();
+		ImageView v = new ImageView(context);
+		int backGroundColor = context.getResources().getColor(R.color.drag_drop_background);
+		v.setBackgroundColor(backGroundColor);
+		v.setImageBitmap(bm);
+		mDragBitmap = bm;
 
-    private void dragView(int x, int y) {
-        mWindowParams.y = y - mDragPoint + mCoordOffset;
-        mWindowManager.updateViewLayout(mDragView, mWindowParams);
-    }
+		mWindowManager = (WindowManager) context.getSystemService("window");
+		mWindowManager.addView(v, mWindowParams);
+		mDragView = v;
+	}
 
-    private void stopDragging() {
-        if (mDragView != null) {
-            WindowManager wm = (WindowManager) getContext().getSystemService("window");
-            wm.removeView(mDragView);
-            mDragView.setImageDrawable(null);
-            mDragView = null;
-        }
-        if (mDragBitmap != null) {
-            mDragBitmap.recycle();
-            mDragBitmap = null;
-        }
-    }
+	private void dragView(int x, int y) {
+		mWindowParams.y = y - mDragPoint + mCoordOffset;
+		mWindowManager.updateViewLayout(mDragView, mWindowParams);
+	}
 
-    public void setDragListener(DragListener l) {
-        mDragListener = l;
-    }
+	private void stopDragging() {
+		if (mDragView != null) {
+			WindowManager wm = (WindowManager) getContext().getSystemService("window");
+			wm.removeView(mDragView);
+			mDragView.setImageDrawable(null);
+			mDragView = null;
+		}
+		if (mDragBitmap != null) {
+			mDragBitmap.recycle();
+			mDragBitmap = null;
+		}
+	}
 
-    public void setDropListener(DropListener l) {
-        mDropListener = l;
-    }
+	public void setDragListener(DragListener l) {
+		mDragListener = l;
+	}
+
+	public void setDropListener(DropListener l) {
+		mDropListener = l;
+	}
 
 	public interface DragListener {
-        void drag(int from, int to);
-    }
+		void drag(int from, int to);
+	}
 
-    public interface DropListener {
-        void drop(int from, int to);
-    }
+	public interface DropListener {
+		void drop(int from, int to);
+	}
 }
