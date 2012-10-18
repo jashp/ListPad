@@ -18,6 +18,7 @@ public class Checklist extends ArrayList<String> {
 	public static final String DEFAULT_DIRECTORY = Environment.getExternalStorageDirectory().toString() + "/Checklists/";
 	private String mTitle;
 	private File mFile;
+	private String mDelimiter = "\n";
 
 	public Checklist() {
 		this.mTitle = "";
@@ -58,7 +59,7 @@ public class Checklist extends ArrayList<String> {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(mFile));
 		ArrayList<String> list = getList();
 		for (String item : list) {
-			writer.write(item + "\r\n");
+			writer.write(item.trim() + mDelimiter);
 		}
 		writer.close();
 	}
@@ -68,10 +69,11 @@ public class Checklist extends ArrayList<String> {
 	}
 
 	public void fromString(String items) {
-		String[] itemsArray = items.split("\r\n");
+		String[] itemsArray = items.split(mDelimiter);
 		ArrayList<String> list = getList();
+		list.clear();
 		for (String item : itemsArray) {
-			list.add(item);
+			list.add(item.trim());
 		}
 	}
 	
@@ -79,10 +81,10 @@ public class Checklist extends ArrayList<String> {
 		ArrayList<String> list = getList();
 		StringBuilder stringBuilder = new StringBuilder();
 		for (String item : list) {
-			stringBuilder.append(item + "\r\n");
+			stringBuilder.append(item.trim() + mDelimiter);
 		}
 		
-		return stringBuilder.substring(0, stringBuilder.length()-2).toString();
+		return stringBuilder.substring(0, stringBuilder.length()-mDelimiter.length()).toString();
 	}
 
 	public String getTitle() {

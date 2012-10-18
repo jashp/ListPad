@@ -6,14 +6,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,7 +33,7 @@ import android.widget.Toast;
 
 import com.jpqr.dragdrop.TouchInterceptor;
 
-public class EditChecklist extends ListActivity {
+public class EditChecklist extends Activity {
 	public static final String EXTRA_PATH = "PATH";
 	private ChecklistAdapter mAdapter;
 	private Checklist mChecklist;
@@ -42,6 +41,8 @@ public class EditChecklist extends ListActivity {
 	private ListView mListView;
 	private Context mContext;
 	private EditText mChecklistNameField;
+	private boolean mListModeActive = true;
+	private EditText mChecklistTextField;
 
 	private EditText mAddItemField;
 
@@ -75,7 +76,7 @@ public class EditChecklist extends ListActivity {
 		}
 
 		setContentView(R.layout.edit_checklist_activity);
-		mListView = getListView();
+		mListView = (ListView) findViewById(R.id.list_field);
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -87,6 +88,8 @@ public class EditChecklist extends ListActivity {
 		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
 		mChecklistNameField.setText(mChecklist.getTitle());
 
+		mChecklistTextField = (EditText) findViewById(R.id.text_field);
+		
 		mAdapter = new ChecklistAdapter(mContext, R.layout.checklist_edit_item);
 		mListView.setAdapter(mAdapter);
 
@@ -118,7 +121,7 @@ public class EditChecklist extends ListActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		save();
+//		save();
 	}
 
 	private void addToChecklist() {
@@ -168,6 +171,21 @@ public class EditChecklist extends ListActivity {
 				builder.setPositiveButton("Yes", dialogClickListener);
 				builder.setNegativeButton("No", dialogClickListener).show();
 
+				return true;
+			case R.id.switch_mode:
+				if (mListModeActive) {
+					mChecklistTextField.setText(mChecklist.toString());
+					mChecklistTextField.setVisibility(View.VISIBLE);
+					mListView.setVisibility(View.GONE);
+					mListModeActive = false;
+				} else {
+					mChecklist.fromString(mChecklistTextField.getText().toString());
+					mChecklistTextField.setVisibility(View.GONE);
+					mListView.setVisibility(View.VISIBLE);
+					mAdapter.notifyDataSetChanged();
+					mListModeActive = true;
+				}
+				
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
