@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 
 import android.os.Environment;
@@ -35,6 +36,18 @@ public class Checklist extends ArrayList<String> {
 		reader.close();
 	}
 
+	public Checklist(URI path) throws IOException, FileNotFoundException {
+		this.mFile = new File(path);
+		this.mTitle = mFile.getName();
+
+		BufferedReader reader = new BufferedReader(new FileReader(mFile));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			add(line);
+		}
+		reader.close();
+	}
+	
 	public void toFile() throws IOException {
 		if (!mTitle.equals(mFile.getName())) {
 			File newFile = new File(mFile.getParentFile().getPath(), mTitle);
@@ -61,6 +74,16 @@ public class Checklist extends ArrayList<String> {
 			list.add(item);
 		}
 	}
+	
+	public String toString() {
+		ArrayList<String> list = getList();
+		StringBuilder stringBuilder = new StringBuilder();
+		for (String item : list) {
+			stringBuilder.append(item + "\r\n");
+		}
+		
+		return stringBuilder.substring(0, stringBuilder.length()-2).toString();
+	}
 
 	public String getTitle() {
 		return mTitle;
@@ -70,8 +93,7 @@ public class Checklist extends ArrayList<String> {
 		this.mTitle = mTitle;
 	}
 
-	public void delete() {
-		mFile.delete();
-		mTitle = null;
+	public boolean delete() {
+		return mFile.delete();
 	}
 }

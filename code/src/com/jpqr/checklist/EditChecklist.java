@@ -2,6 +2,8 @@ package com.jpqr.checklist;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
@@ -9,7 +11,9 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,7 +40,7 @@ public class EditChecklist extends ListActivity {
 	private Checklist mChecklist;
 	private String mPath;
 	private ListView mListView;
-
+	private Context mContext;
 	private EditText mChecklistNameField;
 
 	private EditText mAddItemField;
@@ -50,18 +54,22 @@ public class EditChecklist extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mPath = getIntent().getStringExtra(EXTRA_PATH);
-
-		if (mPath == null) {
+		mContext = this;
+		
+		Uri path = getIntent().getData();
+		if (path == null) {
 			mChecklist = new Checklist();
 		} else {
 			try {
-				mChecklist = new Checklist(mPath);
+				mChecklist = new Checklist(new URI(path.toString()));
 			} catch (FileNotFoundException e) {
-				Toast.makeText(this, "File not found.", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, "File not found.", Toast.LENGTH_LONG).show();
 				e.printStackTrace();
 			} catch (IOException e) {
-				Toast.makeText(this, "Input/output problem.", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, "Input/output problem.", Toast.LENGTH_LONG).show();
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				Toast.makeText(mContext, "Problem with the filepath.", Toast.LENGTH_LONG).show();
 				e.printStackTrace();
 			}
 		}
@@ -79,13 +87,13 @@ public class EditChecklist extends ListActivity {
 		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
 		mChecklistNameField.setText(mChecklist.getTitle());
 
-		mAdapter = new ChecklistAdapter(this, R.layout.checklist_edit_item);
+		mAdapter = new ChecklistAdapter(mContext, R.layout.checklist_edit_item);
 		mListView.setAdapter(mAdapter);
 
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Toast.makeText(EditChecklist.this, "Yo", Toast.LENGTH_SHORT).show();
+				Toast.makeText(mContext, "Yo", Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -141,8 +149,12 @@ public class EditChecklist extends ListActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
 							case DialogInterface.BUTTON_POSITIVE:
-								mChecklist.delete();
-								finish();
+								if (mChecklist.delete()) {
+									finish();
+									Toast.makeText(mContext, "File deleted.", Toast.LENGTH_LONG).show();
+								} else {
+									Toast.makeText(mContext, "Problem deleting file.", Toast.LENGTH_LONG).show();
+								}
 							break;
 
 							case DialogInterface.BUTTON_NEGATIVE:
@@ -151,7 +163,7 @@ public class EditChecklist extends ListActivity {
 					}
 				};
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 				builder.setMessage("Are you sure you want to delete this checklist?");
 				builder.setPositiveButton("Yes", dialogClickListener);
 				builder.setNegativeButton("No", dialogClickListener).show();
@@ -166,14 +178,14 @@ public class EditChecklist extends ListActivity {
 		String fileName = mChecklistNameField.getText().toString().trim();
 
 		if (!isFilenameValid(fileName)) {
-			Toast.makeText(this, "The list name is not valid.", Toast.LENGTH_LONG).show();
+			Toast.makeText(mContext, "The list name is not valid.", Toast.LENGTH_LONG).show();
 			return false;
 		}
 
 		mChecklist.setTitle(fileName);
 		try {
 			mChecklist.toFile();
-			Toast.makeText(this, "List saved.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(mContext, "List saved.", Toast.LENGTH_SHORT).show();
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();

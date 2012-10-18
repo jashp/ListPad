@@ -36,12 +36,13 @@ public final class R {
         public static final int add_item_field=0x7f090005;
         public static final int checklist_title=0x7f090006;
         public static final int create_checklist=0x7f090008;
-        public static final int delete=0x7f09000a;
+        public static final int delete=0x7f09000b;
         public static final int icon=0x7f090000;
         public static final int item_name=0x7f090002;
         public static final int menu_settings=0x7f090007;
+        public static final int refresh=0x7f090009;
         public static final int remove_button=0x7f090003;
-        public static final int save=0x7f090009;
+        public static final int save=0x7f09000a;
     }
     public static final class layout {
         public static final int checklist_edit_item=0x7f030000;
