@@ -19,7 +19,7 @@
         </activity>
         <activity
             android:name=".EditChecklist"
-            android:label="Edit Checklist" >
+            android:label="ListPad" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.EDIT" />
