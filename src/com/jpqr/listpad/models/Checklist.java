@@ -52,6 +52,8 @@ public class Checklist extends ArrayList<String> {
 			writer.write(item.trim() + mDelimiter);
 		}
 		writer.close();
+		
+		mOriginalText = toString();
 	}
 
 	public ArrayList<String> getList() {

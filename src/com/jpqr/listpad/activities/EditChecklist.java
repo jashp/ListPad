@@ -51,6 +51,8 @@ public class EditChecklist extends SherlockActivity {
 	private boolean mIsFavourite;
 	private EditText mChecklistTextField;
 	private String mPath;
+	private DialogInterface.OnClickListener mDeleteDialog;
+	private DialogInterface.OnClickListener mCloseDialog;
 
 	private EditText mAddItemField;
 
@@ -76,9 +78,9 @@ public class EditChecklist extends SherlockActivity {
 			} else {
 				throw new URISyntaxException("null", "EditChecklist Activity must be opened with a path in the intent or the instance");
 			}
-			
+
 			mChecklist = new Checklist(pathURI);
-			
+
 			SharedPreferencesManager preferences = SharedPreferencesManager.getInstance();
 			mPath = pathURI.toString();
 			preferences.addRecentFile(mPath);
@@ -93,7 +95,6 @@ public class EditChecklist extends SherlockActivity {
 			Toast.makeText(mContext, "Problem with file path.", Toast.LENGTH_LONG).show();
 			e.printStackTrace();
 		}
-
 
 		setContentView(R.layout.edit_checklist_activity);
 		mListView = (ListView) findViewById(R.id.list_field);
@@ -170,76 +171,117 @@ public class EditChecklist extends SherlockActivity {
 				save();
 				return true;
 			case R.id.delete:
-				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which) {
-							case DialogInterface.BUTTON_POSITIVE:
-								if (mChecklist.delete()) {
-									finish();
-									Toast.makeText(mContext, "File deleted.", Toast.LENGTH_LONG).show();
-								} else {
-									Toast.makeText(mContext, "Problem deleting file.", Toast.LENGTH_LONG).show();
-								}
-							break;
-
-							case DialogInterface.BUTTON_NEGATIVE:
-							break;
-						}
-					}
-				};
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-				builder.setMessage("Are you sure you want to delete this checklist?");
-				builder.setPositiveButton("Yes", dialogClickListener);
-				builder.setNegativeButton("No", dialogClickListener);
-				builder.show();
-
+				delete();
 				return true;
 			case R.id.switch_mode:
-				if (mListModeActive) {
-					mChecklistTextField.setText(mChecklist.toString());
-					mChecklistTextField.setVisibility(View.VISIBLE);
-					mListView.setVisibility(View.GONE);
-					mListModeActive = false;
-				} else {
-					mChecklist.fromString(mChecklistTextField.getText().toString());
-					mChecklistTextField.setVisibility(View.GONE);
-					mListView.setVisibility(View.VISIBLE);
-					mAdapter.notifyDataSetChanged();
-					mListModeActive = true;
-				}
-
+				switchMode();
 				return true;
 			case R.id.favourite:
-				if (mIsFavourite) {
-					item.setIcon(android.R.drawable.star_big_off);
-					SharedPreferencesManager.getInstance().removeFavouriteFile(mPath);
-					mIsFavourite = false;
-					Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
-				} else {
-					item.setIcon(android.R.drawable.star_big_on);
-					SharedPreferencesManager.getInstance().addFavouriteFile(mPath);
-					mIsFavourite = true;
-					Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
-				}
+				favourite(item);
 				return true;
-				
 			case R.id.close:
-				if (mIsFavourite) {
-					item.setIcon(android.R.drawable.star_big_off);
-					SharedPreferencesManager.getInstance().removeFavouriteFile(mPath);
-					mIsFavourite = false;
-					Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
-				} else {
-					item.setIcon(android.R.drawable.star_big_on);
-					SharedPreferencesManager.getInstance().addFavouriteFile(mPath);
-					mIsFavourite = true;
-					Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
-				}
+				close();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void delete() {
+		if (mDeleteDialog == null || mDeleteDialogBuilder == null) {
+			mDeleteDialog = new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					switch (which) {
+						case DialogInterface.BUTTON_POSITIVE:
+							if (mChecklist.delete()) {
+								finish();
+								Toast.makeText(mContext, "File deleted.", Toast.LENGTH_LONG).show();
+							} else {
+								Toast.makeText(mContext, "Problem deleting file.", Toast.LENGTH_LONG).show();
+							}
+						break;
+
+						case DialogInterface.BUTTON_NEGATIVE:
+						break;
+					}
+				}
+			};
+			mDeleteDialogBuilder = new AlertDialog.Builder(mContext);
+			mDeleteDialogBuilder.setMessage("Are you sure you want to delete this file?");
+			mDeleteDialogBuilder.setPositiveButton("Yes", mDeleteDialog);
+			mDeleteDialogBuilder.setNegativeButton("No", mDeleteDialog);
+		}
+		mDeleteDialogBuilder.show();
+	}
+
+	private void switchMode() {
+		if (mListModeActive) {
+			mChecklistTextField.setText(mChecklist.toString());
+			mChecklistTextField.setVisibility(View.VISIBLE);
+			mListView.setVisibility(View.GONE);
+			mListModeActive = false;
+		} else {
+			mChecklist.fromString(mChecklistTextField.getText().toString());
+			mChecklistTextField.setVisibility(View.GONE);
+			mListView.setVisibility(View.VISIBLE);
+			mAdapter.notifyDataSetChanged();
+			mListModeActive = true;
+		}
+	}
+
+	private void favourite(MenuItem item) {
+		if (mIsFavourite) {
+			item.setIcon(android.R.drawable.star_big_off);
+			SharedPreferencesManager.getInstance().removeFavouriteFile(mPath);
+			mIsFavourite = false;
+			Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
+		} else {
+			item.setIcon(android.R.drawable.star_big_on);
+			SharedPreferencesManager.getInstance().addFavouriteFile(mPath);
+			mIsFavourite = true;
+			Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	private void close() {
+		if (mChecklist.isModified()) {
+			if (mCloseDialog == null || mCloseDialogBuilder == null) {
+				mCloseDialog = new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
+							case DialogInterface.BUTTON_POSITIVE:
+								if (save()) {
+									finish();
+								}
+							break;
+							case DialogInterface.BUTTON_NEGATIVE:
+								finish();
+							break;
+							case DialogInterface.BUTTON_NEUTRAL:
+							break;
+						}
+					}
+				};
+				mCloseDialogBuilder = new AlertDialog.Builder(mContext);
+				mCloseDialogBuilder.setMessage("Do you want to save this file before closing?");
+				mCloseDialogBuilder.setPositiveButton("Yes", mCloseDialog);
+				mCloseDialogBuilder.setNegativeButton("No", mCloseDialog);
+				mCloseDialogBuilder.setNeutralButton("Cancel", mCloseDialog);
+			}
+			mCloseDialogBuilder.show();
+		} else {
+			finish();
+		}
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+			case KeyEvent.KEYCODE_BACK:
+				close(); 
+			break;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 
 	private boolean save() {
@@ -256,6 +298,7 @@ public class EditChecklist extends SherlockActivity {
 			Toast.makeText(mContext, "List saved.", Toast.LENGTH_SHORT).show();
 			return true;
 		} catch (IOException e) {
+			Toast.makeText(mContext, "Problem saving file.", Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 			return false;
 		}
@@ -280,6 +323,8 @@ public class EditChecklist extends SherlockActivity {
 			}
 		}
 	};
+	private AlertDialog.Builder mCloseDialogBuilder;
+	private AlertDialog.Builder mDeleteDialogBuilder;
 
 	public final class ChecklistAdapter extends ArrayAdapter<String> {
 
