@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,6 +37,7 @@ import com.jpqr.listpad.R;
 import com.jpqr.listpad.R.id;
 import com.jpqr.listpad.R.layout;
 import com.jpqr.listpad.R.menu;
+import com.jpqr.listpad.managers.SharedPreferencesManager;
 import com.jpqr.listpad.models.Checklist;
 
 public class EditChecklist extends SherlockActivity {
@@ -48,7 +48,9 @@ public class EditChecklist extends SherlockActivity {
 	private Context mContext;
 	private EditText mChecklistNameField;
 	private boolean mListModeActive = true;
+	private boolean mIsFavourite;
 	private EditText mChecklistTextField;
+	private String mPath;
 
 	private EditText mAddItemField;
 
@@ -63,23 +65,35 @@ public class EditChecklist extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 
-		Uri path = getIntent().getData();
-		if (path == null) {
-			mChecklist = new Checklist();
-		} else {
-			try {
-				mChecklist = new Checklist(new URI(path.toString()));
-			} catch (FileNotFoundException e) {
-				Toast.makeText(mContext, "File not found.", Toast.LENGTH_LONG).show();
-				e.printStackTrace();
-			} catch (IOException e) {
-				Toast.makeText(mContext, "Input/output problem.", Toast.LENGTH_LONG).show();
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				Toast.makeText(mContext, "Problem with the filepath.", Toast.LENGTH_LONG).show();
-				e.printStackTrace();
+		Uri pathUri = getIntent().getData();
+		String pathString = getIntent().getStringExtra(EXTRA_PATH);
+		URI pathURI;
+		try {
+			if (pathUri != null) {
+				pathURI = new URI(pathUri.toString());
+			} else if (pathString != null) {
+				pathURI = new URI(pathString);
+			} else {
+				throw new URISyntaxException("null", "EditChecklist Activity must be opened with a path in the intent or the instance");
 			}
+			
+			mChecklist = new Checklist(pathURI);
+			
+			SharedPreferencesManager preferences = SharedPreferencesManager.getInstance();
+			mPath = pathURI.toString();
+			preferences.addRecentFile(mPath);
+			mIsFavourite = preferences.isFavouriteFile(mPath);
+		} catch (FileNotFoundException e) {
+			Toast.makeText(mContext, "File not found.", Toast.LENGTH_LONG).show();
+			e.printStackTrace();
+		} catch (IOException e) {
+			Toast.makeText(mContext, "Input/output problem.", Toast.LENGTH_LONG).show();
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			Toast.makeText(mContext, "Problem with file path.", Toast.LENGTH_LONG).show();
+			e.printStackTrace();
 		}
+
 
 		setContentView(R.layout.edit_checklist_activity);
 		mListView = (ListView) findViewById(R.id.list_field);
@@ -141,9 +155,11 @@ public class EditChecklist extends SherlockActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getSupportMenuInflater();
-	    inflater.inflate(R.menu.edit_file_menu, menu);
-	    return super.onCreateOptionsMenu(menu);
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.edit_file_menu, menu);
+		MenuItem favouriteItem = menu.findItem(R.id.favourite);
+		favouriteItem.setIcon(mIsFavourite ? android.R.drawable.star_big_on : android.R.drawable.star_big_off);
+		return super.onCreateOptionsMenu(menu);
 
 	}
 
@@ -175,7 +191,8 @@ public class EditChecklist extends SherlockActivity {
 				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 				builder.setMessage("Are you sure you want to delete this checklist?");
 				builder.setPositiveButton("Yes", dialogClickListener);
-				builder.setNegativeButton("No", dialogClickListener).show();
+				builder.setNegativeButton("No", dialogClickListener);
+				builder.show();
 
 				return true;
 			case R.id.switch_mode:
@@ -192,6 +209,33 @@ public class EditChecklist extends SherlockActivity {
 					mListModeActive = true;
 				}
 
+				return true;
+			case R.id.favourite:
+				if (mIsFavourite) {
+					item.setIcon(android.R.drawable.star_big_off);
+					SharedPreferencesManager.getInstance().removeFavouriteFile(mPath);
+					mIsFavourite = false;
+					Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
+				} else {
+					item.setIcon(android.R.drawable.star_big_on);
+					SharedPreferencesManager.getInstance().addFavouriteFile(mPath);
+					mIsFavourite = true;
+					Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
+				}
+				return true;
+				
+			case R.id.close:
+				if (mIsFavourite) {
+					item.setIcon(android.R.drawable.star_big_off);
+					SharedPreferencesManager.getInstance().removeFavouriteFile(mPath);
+					mIsFavourite = false;
+					Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
+				} else {
+					item.setIcon(android.R.drawable.star_big_on);
+					SharedPreferencesManager.getInstance().addFavouriteFile(mPath);
+					mIsFavourite = true;
+					Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
+				}
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -218,7 +262,7 @@ public class EditChecklist extends SherlockActivity {
 	}
 
 	public static boolean isFilenameValid(String fileName) {
-		//TODO check filename
+		// TODO check filename
 		return true;
 	}
 

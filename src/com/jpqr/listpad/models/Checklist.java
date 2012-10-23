@@ -19,22 +19,11 @@ public class Checklist extends ArrayList<String> {
 	private String mTitle;
 	private File mFile;
 	private String mDelimiter = "\n";
+	private String mOriginalText;
 
 	public Checklist() {
 		this.mTitle = "";
 		this.mFile = new File(DEFAULT_DIRECTORY, "untitled.txt");
-	}
-
-	public Checklist(String path) throws IOException, FileNotFoundException {
-		this.mFile = new File(path);
-		this.mTitle = mFile.getName();
-
-		BufferedReader reader = new BufferedReader(new FileReader(mFile));
-		String line;
-		while ((line = reader.readLine()) != null) {
-			add(line);
-		}
-		reader.close();
 	}
 
 	public Checklist(URI path) throws IOException, FileNotFoundException {
@@ -47,6 +36,8 @@ public class Checklist extends ArrayList<String> {
 			add(line);
 		}
 		reader.close();
+		
+		mOriginalText = toString();
 	}
 	
 	public void toFile() throws IOException {
@@ -55,7 +46,6 @@ public class Checklist extends ArrayList<String> {
 			mFile.renameTo(newFile);
 			mFile = newFile;
 		}
-
 		BufferedWriter writer = new BufferedWriter(new FileWriter(mFile));
 		ArrayList<String> list = getList();
 		for (String item : list) {
@@ -97,5 +87,9 @@ public class Checklist extends ArrayList<String> {
 
 	public boolean delete() {
 		return mFile.delete();
+	}
+	
+	public boolean isModified() {
+		return !(mOriginalText.equals(toString()));
 	}
 }
