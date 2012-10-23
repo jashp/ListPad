@@ -1,4 +1,4 @@
-package com.jpqr.listpad;
+package com.jpqr.listpad.activities;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,8 +15,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -31,14 +29,21 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.jpqr.dragdrop.TouchInterceptor;
 import com.jpqr.listpad.R;
+import com.jpqr.listpad.R.id;
+import com.jpqr.listpad.R.layout;
+import com.jpqr.listpad.R.menu;
+import com.jpqr.listpad.models.Checklist;
 
-public class EditChecklist extends Activity {
+public class EditChecklist extends SherlockActivity {
 	public static final String EXTRA_PATH = "PATH";
 	private ChecklistAdapter mAdapter;
 	private Checklist mChecklist;
-	private String mPath;
 	private ListView mListView;
 	private Context mContext;
 	private EditText mChecklistNameField;
@@ -57,7 +62,7 @@ public class EditChecklist extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mContext = this;
-		
+
 		Uri path = getIntent().getData();
 		if (path == null) {
 			mChecklist = new Checklist();
@@ -90,7 +95,7 @@ public class EditChecklist extends Activity {
 		mChecklistNameField.setText(mChecklist.getTitle());
 
 		mChecklistTextField = (EditText) findViewById(R.id.text_field);
-		
+
 		mAdapter = new ChecklistAdapter(mContext, R.layout.checklist_edit_item);
 		mListView.setAdapter(mAdapter);
 
@@ -122,7 +127,7 @@ public class EditChecklist extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-//		save();
+		// save();
 	}
 
 	private void addToChecklist() {
@@ -136,17 +141,17 @@ public class EditChecklist extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.edit_checklist_menu, menu);
-		return true;
+	    MenuInflater inflater = getSupportMenuInflater();
+	    inflater.inflate(R.menu.edit_file_menu, menu);
+	    return super.onCreateOptionsMenu(menu);
+
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.save:
-				if (save()) {
-					finish();
-				}
+				save();
 				return true;
 			case R.id.delete:
 				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -186,7 +191,7 @@ public class EditChecklist extends Activity {
 					mAdapter.notifyDataSetChanged();
 					mListModeActive = true;
 				}
-				
+
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -213,6 +218,7 @@ public class EditChecklist extends Activity {
 	}
 
 	public static boolean isFilenameValid(String fileName) {
+		//TODO check filename
 		return true;
 	}
 

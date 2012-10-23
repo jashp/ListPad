@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/favourite"
+        android:icon="@android:drawable/star_off"
+        android:orderInCategory="100"
+        android:showAsAction="always"/>
+    <item
+        android:id="@+id/save"
+        android:icon="@android:drawable/ic_menu_save"
+        android:orderInCategory="101"
+        android:showAsAction="always"/>
+    <item
+        android:id="@+id/switch_mode"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:orderInCategory="102"
+        android:showAsAction="always"/>
+    <item
+        android:id="@+id/delete"
+        android:orderInCategory="103"
+        android:title="Delete"/>
+    <item
+        android:id="@+id/close"
+        android:orderInCategory="104"
+        android:title="Close"/>
+
+</menu>

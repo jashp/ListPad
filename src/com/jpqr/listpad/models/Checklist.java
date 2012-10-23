@@ -1,4 +1,4 @@
-package com.jpqr.listpad;
+package com.jpqr.listpad.models;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

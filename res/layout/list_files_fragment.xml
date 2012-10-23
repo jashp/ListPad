@@ -5,9 +5,8 @@
     android:orientation="vertical" >
 
     <ListView
-        android:id="@+id/checklist_list"
+        android:id="@+id/files_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ListView>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

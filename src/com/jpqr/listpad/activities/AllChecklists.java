@@ -1,11 +1,15 @@
-package com.jpqr.listpad;
+package com.jpqr.listpad.activities;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 import com.jpqr.listpad.R;
+import com.jpqr.listpad.R.id;
+import com.jpqr.listpad.R.menu;
+import com.jpqr.listpad.models.Checklist;
 
 import android.app.ListActivity;
 import android.content.Context;
