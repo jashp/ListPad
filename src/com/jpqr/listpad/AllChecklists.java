@@ -1,9 +1,11 @@
-package com.jpqr.checklist;
+package com.jpqr.listpad;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.jpqr.listpad.R;
 
 import android.app.ListActivity;
 import android.content.Context;

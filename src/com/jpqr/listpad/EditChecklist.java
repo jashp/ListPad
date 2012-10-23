@@ -1,4 +1,4 @@
-package com.jpqr.checklist;
+package com.jpqr.listpad;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,6 +32,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.jpqr.dragdrop.TouchInterceptor;
+import com.jpqr.listpad.R;
 
 public class EditChecklist extends Activity {
 	public static final String EXTRA_PATH = "PATH";

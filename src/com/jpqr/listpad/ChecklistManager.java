@@ -1,4 +1,4 @@
-package com.jpqr.checklist;
+package com.jpqr.listpad;
 
 import java.util.ArrayList;
 
