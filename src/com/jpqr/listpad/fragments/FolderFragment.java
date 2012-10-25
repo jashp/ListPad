@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.jpqr.adapters.FileListAdapter;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.activities.EditChecklist;
 import com.jpqr.listpad.models.Checklist;
@@ -32,7 +33,7 @@ public class FolderFragment extends SherlockFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.list_files_fragment, container, false);
 		mListView = (ListView) view.findViewById(R.id.files_list);
-		mAdapter = new FileListAdapter();
+		mAdapter = new FileListAdapter(getActivity(), mFiles, true);
 		
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
@@ -90,24 +91,6 @@ public class FolderFragment extends SherlockFragment {
 		}
 	}
 
-	public class FileListAdapter extends ArrayAdapter<File> {
-		private final static int RESOURCE_ID = android.R.layout.simple_list_item_1;
 
-		public FileListAdapter() {
-			super(getActivity(), RESOURCE_ID, mFiles);
-		}
-
-		@Override
-		public View getView(final int position, View view, ViewGroup parent) {
-			if (view == null) {
-				LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(RESOURCE_ID, null);
-			}
-			TextView itemName = (TextView) view.findViewById(android.R.id.text1);
-			itemName.setText(mFiles.get(position).getName());
-
-			return view;
-		}
-	}
 
 }

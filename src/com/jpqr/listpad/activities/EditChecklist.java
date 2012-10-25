@@ -33,6 +33,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.jpqr.adapters.ChecklistAdapter;
 import com.jpqr.dragdrop.TouchInterceptor;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.db.FilesDataSource;
@@ -110,7 +111,7 @@ public class EditChecklist extends SherlockActivity {
 
 		mChecklistTextField = (EditText) findViewById(R.id.text_field);
 
-		mAdapter = new ChecklistAdapter(mContext, R.layout.checklist_edit_item);
+		mAdapter = new ChecklistAdapter(mContext, mChecklist, R.layout.checklist_edit_item);
 		mListView.setAdapter(mAdapter);
 		
 		mListView.setOnItemClickListener(new OnItemClickListener() {
@@ -342,44 +343,4 @@ public class EditChecklist extends SherlockActivity {
 	};
 	private AlertDialog.Builder mCloseDialogBuilder;
 	private AlertDialog.Builder mDeleteDialogBuilder;
-
-	public final class ChecklistAdapter extends ArrayAdapter<String> {
-
-		public ChecklistAdapter(Context context, int textViewResourceId) {
-			super(context, textViewResourceId, mChecklist);
-		}
-
-		public int getCount() {
-			return mChecklist.size();
-		}
-
-		public String getItem(int position) {
-			return mChecklist.get(position);
-		}
-
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(final int position, View view, ViewGroup parent) {
-			if (view == null) {
-				LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.checklist_edit_item, null);
-			}
-			TextView itemName = (TextView) view.findViewById(R.id.item_name);
-			ImageView removeButton = (ImageView) view.findViewById(R.id.remove_button);
-			OnClickListener onClickListener = new OnClickListener() {
-				public void onClick(View v) {
-					mChecklist.remove(position);
-					notifyDataSetChanged();
-				}
-			};
-
-			itemName.setText(mChecklist.get(position));
-			removeButton.setOnClickListener(onClickListener);
-
-			return view;
-		}
-	}
 }
