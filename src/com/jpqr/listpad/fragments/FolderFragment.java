@@ -1,23 +1,14 @@
-package com.jpqr.listpad.activities;
+package com.jpqr.listpad.fragments;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
-import com.jpqr.listpad.R;
-import com.jpqr.listpad.R.id;
-import com.jpqr.listpad.R.menu;
-import com.jpqr.listpad.models.Checklist;
-
-import android.app.ListActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,53 +17,41 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class AllChecklists extends ListActivity {
+import com.actionbarsherlock.app.SherlockFragment;
+import com.jpqr.listpad.R;
+import com.jpqr.listpad.activities.EditChecklist;
+import com.jpqr.listpad.models.Checklist;
+
+
+public class FolderFragment extends SherlockFragment {
 	private ArrayList<File> mFiles = new ArrayList<File>();
-	private FileListAdapter mAdapter;
+	private ListView mListView;
+	private ArrayAdapter<File> mAdapter;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.list_files_fragment, container, false);
+		mListView = (ListView) view.findViewById(R.id.files_list);
 		mAdapter = new FileListAdapter();
-
-		ListView listView = getListView();
-		listView.setAdapter(mAdapter);
-
-		listView.setOnItemClickListener(new OnItemClickListener() {
+		
+		mListView.setAdapter(mAdapter);
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				EditChecklist.newInstance(AllChecklists.this, mFiles.get(position).getPath());
+				EditChecklist.newInstance(getActivity(), mFiles.get(position).toURI().toString());
 			}
-		});
-
+		});		
+		return view;
 	}
 
+
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
 		refreshChecklists();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_main, menu);
-		return true;
-	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.create_checklist:
-				EditChecklist.newInstance(this, null);
-				refreshChecklists();
-				return true;
-			case R.id.refresh:
-				refreshChecklists();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
 
 	private void refreshChecklists() {
 		File dir = new File(Checklist.DEFAULT_DIRECTORY);
@@ -104,10 +83,8 @@ public class AllChecklists extends ListActivity {
 
 	public boolean checkExternalStorage() {
 		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
+		if (state.equals(Environment.MEDIA_MOUNTED)) {
 			return true;
-		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			return false;
 		} else {
 			return false;
 		}
@@ -117,7 +94,7 @@ public class AllChecklists extends ListActivity {
 		private final static int RESOURCE_ID = android.R.layout.simple_list_item_1;
 
 		public FileListAdapter() {
-			super(AllChecklists.this, RESOURCE_ID, mFiles);
+			super(getActivity(), RESOURCE_ID, mFiles);
 		}
 
 		@Override

@@ -30,9 +30,8 @@ import android.widget.TabWidget;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.jpqr.listpad.R;
-import com.jpqr.listpad.R.id;
-import com.jpqr.listpad.R.layout;
 import com.jpqr.listpad.db.FilesDataSource;
+import com.jpqr.listpad.fragments.FolderFragment;
 import com.jpqr.listpad.fragments.ListFilesFragment;
 
 /**
@@ -58,6 +57,8 @@ public class MainActivity extends SherlockFragmentActivity {
 
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
+		mTabsAdapter.addTab(mTabHost.newTabSpec("folder").setIndicator("Folder"), FolderFragment.class, new Bundle());
+
 		Bundle favourite = new Bundle();
 		favourite.putInt(ListFilesFragment.ARG_TYPE, FilesDataSource.Type.FAVOURITE);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("favourite").setIndicator("Favourite"), ListFilesFragment.class, favourite);
@@ -66,6 +67,8 @@ public class MainActivity extends SherlockFragmentActivity {
 		recent.putInt(ListFilesFragment.ARG_TYPE, FilesDataSource.Type.RECENT);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("recent").setIndicator("Recent"), ListFilesFragment.class, recent);
 
+		
+		
 		if (savedInstanceState != null) {
 			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
 		}

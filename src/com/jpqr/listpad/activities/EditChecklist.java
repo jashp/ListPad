@@ -159,7 +159,6 @@ public class EditChecklist extends SherlockActivity {
 		MenuItem favouriteItem = menu.findItem(R.id.favourite);
 		favouriteItem.setIcon(mIsFavourite ? android.R.drawable.star_big_on : android.R.drawable.star_big_off);
 		return super.onCreateOptionsMenu(menu);
-
 	}
 
 	@Override
