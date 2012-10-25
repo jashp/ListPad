@@ -61,7 +61,7 @@ public class FolderFragment extends SherlockFragment {
 
 			try {
 				Checklist sample = new Checklist();
-				sample.setTitle("groceries.txt");
+				sample.setTitle("groceries sample.txt");
 				sample.add("milk");
 				sample.add("eggs");
 				sample.add("bread");

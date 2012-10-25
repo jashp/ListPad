@@ -16,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -111,11 +112,30 @@ public class EditChecklist extends SherlockActivity {
 
 		mAdapter = new ChecklistAdapter(mContext, R.layout.checklist_edit_item);
 		mListView.setAdapter(mAdapter);
-
+		
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Toast.makeText(mContext, "Yo", Toast.LENGTH_SHORT).show();
+			public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+				AlertDialog.Builder editPrompt = new AlertDialog.Builder(mContext);
+				final TextView itemName = (TextView) view.findViewById(R.id.item_name);
+				final EditText editText = new EditText(mContext);
+				editText.setText(itemName.getText());
+				editPrompt.setView(editText);
+
+				editPrompt.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String value = editText.getText().toString();
+					itemName.setText(value);
+					mChecklist.set(position, value);
+				  }
+				});
+
+				editPrompt.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				  public void onClick(DialogInterface dialog, int whichButton) {
+				  }
+				});
+				
+				editPrompt.show();
 			}
 		});
 
@@ -275,7 +295,7 @@ public class EditChecklist extends SherlockActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 			case KeyEvent.KEYCODE_BACK:
-				close(); 
+				close();
 			break;
 		}
 		return super.onKeyDown(keyCode, event);
