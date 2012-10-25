@@ -34,10 +34,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.jpqr.dragdrop.TouchInterceptor;
 import com.jpqr.listpad.R;
-import com.jpqr.listpad.R.id;
-import com.jpqr.listpad.R.layout;
-import com.jpqr.listpad.R.menu;
-import com.jpqr.listpad.managers.SharedPreferencesManager;
+import com.jpqr.listpad.db.FilesDataSource;
 import com.jpqr.listpad.models.Checklist;
 
 public class EditChecklist extends SherlockActivity {
@@ -53,6 +50,7 @@ public class EditChecklist extends SherlockActivity {
 	private String mPath;
 	private DialogInterface.OnClickListener mDeleteDialog;
 	private DialogInterface.OnClickListener mCloseDialog;
+	private FilesDataSource mDataSource;
 
 	private EditText mAddItemField;
 
@@ -66,7 +64,9 @@ public class EditChecklist extends SherlockActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mContext = this;
-
+		mDataSource = new FilesDataSource(mContext);
+		mDataSource.open();
+		
 		Uri pathUri = getIntent().getData();
 		String pathString = getIntent().getStringExtra(EXTRA_PATH);
 		URI pathURI;
@@ -80,11 +80,9 @@ public class EditChecklist extends SherlockActivity {
 			}
 
 			mChecklist = new Checklist(pathURI);
-
-			SharedPreferencesManager preferences = SharedPreferencesManager.getInstance();
 			mPath = pathURI.toString();
-			preferences.addRecentFile(mPath);
-			mIsFavourite = preferences.isFavouriteFile(mPath);
+			mDataSource.addFile(mPath, FilesDataSource.Type.RECENT);
+			mIsFavourite = mDataSource.isFavourite(mPath);
 		} catch (FileNotFoundException e) {
 			Toast.makeText(mContext, "File not found.", Toast.LENGTH_LONG).show();
 			e.printStackTrace();
@@ -232,12 +230,12 @@ public class EditChecklist extends SherlockActivity {
 	private void favourite(MenuItem item) {
 		if (mIsFavourite) {
 			item.setIcon(android.R.drawable.star_big_off);
-			SharedPreferencesManager.getInstance().removeFavouriteFile(mPath);
+			mDataSource.deleteFile(mPath, FilesDataSource.Type.FAVOURITE);
 			mIsFavourite = false;
 			Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
 		} else {
 			item.setIcon(android.R.drawable.star_big_on);
-			SharedPreferencesManager.getInstance().addFavouriteFile(mPath);
+			mDataSource.addFile(mPath, FilesDataSource.Type.FAVOURITE);
 			mIsFavourite = true;
 			Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
 		}

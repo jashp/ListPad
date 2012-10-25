@@ -32,6 +32,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.R.id;
 import com.jpqr.listpad.R.layout;
+import com.jpqr.listpad.db.FilesDataSource;
 import com.jpqr.listpad.fragments.ListFilesFragment;
 
 /**
@@ -43,7 +44,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	TabHost mTabHost;
 	ViewPager mViewPager;
 	TabsAdapter mTabsAdapter;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// setTheme(SampleList.THEME); //Used for theme switching in samples
@@ -58,13 +59,13 @@ public class MainActivity extends SherlockFragmentActivity {
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
 		Bundle favourite = new Bundle();
-		favourite.putInt(ListFilesFragment.ARG_TYPE, ListFilesFragment.FAVOURITES);
+		favourite.putInt(ListFilesFragment.ARG_TYPE, FilesDataSource.Type.FAVOURITE);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("favourite").setIndicator("Favourite"), ListFilesFragment.class, favourite);
-		
+
 		Bundle recent = new Bundle();
-		recent.putInt(ListFilesFragment.ARG_TYPE, ListFilesFragment.RECENT);
+		recent.putInt(ListFilesFragment.ARG_TYPE, FilesDataSource.Type.RECENT);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("recent").setIndicator("Recent"), ListFilesFragment.class, recent);
-		
+
 		if (savedInstanceState != null) {
 			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
 		}
