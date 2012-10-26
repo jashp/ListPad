@@ -13,11 +13,9 @@ import android.widget.TextView;
 
 import com.jpqr.listpad.R;
 
-
-
 public class FileListAdapter extends ArrayAdapter<File> {
 	private ArrayList<File> mFiles;
-	
+
 	public FileListAdapter(Context context, ArrayList<File> files) {
 		super(context, R.layout.file_list_item, files);
 		mFiles = files;

@@ -31,6 +31,7 @@ public final class ChecklistAdapter extends ArrayAdapter<String> {
 			TextView itemName = (TextView) view.findViewById(R.id.item_name);
 			ImageView removeButton = (ImageView) view.findViewById(R.id.remove_button);
 			OnClickListener onClickListener = new OnClickListener() {
+				@Override
 				public void onClick(View v) {
 					mChecklist.remove(position);
 					notifyDataSetChanged();

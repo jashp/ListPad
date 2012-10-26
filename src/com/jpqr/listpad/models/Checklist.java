@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 
 import android.os.Environment;
@@ -26,8 +25,8 @@ public class Checklist extends ArrayList<String> {
 		this.mFile = new File(DEFAULT_DIRECTORY, "untitled.txt");
 	}
 
-	public Checklist(URI path) throws IOException, FileNotFoundException {
-		this.mFile = new File(path);
+	public Checklist(File file) throws IOException, FileNotFoundException {
+		this.mFile = file;
 		this.mTitle = mFile.getName();
 
 		BufferedReader reader = new BufferedReader(new FileReader(mFile));
@@ -57,7 +56,7 @@ public class Checklist extends ArrayList<String> {
 	}
 
 	public ArrayList<String> getList() {
-		return (ArrayList<String>) this;
+		return this;
 	}
 
 	public void fromString(String items) {
@@ -69,6 +68,7 @@ public class Checklist extends ArrayList<String> {
 		}
 	}
 	
+	@Override
 	public String toString() {
 		ArrayList<String> list = getList();
 		

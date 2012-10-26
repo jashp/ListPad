@@ -18,14 +18,13 @@
         android:layout_height="match_parent"
         android:drawSelectorOnTop="false"
         android:fastScrollEnabled="true"
-        android:textSize="18sp" >
-    </com.jpqr.dragdrop.TouchInterceptor>
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/text_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Write your items here." 
-        android:visibility="gone"/>
+        android:hint="Write your items here."
+        android:visibility="gone" />
 
 </LinearLayout>

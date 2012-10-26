@@ -65,7 +65,7 @@ public class FilePicker extends SherlockActivity {
 					updateDir();
 					mForwardStack.clear();
 				} else {
-					EditChecklist.newInstance(mContext, file.toURI().toString());
+					EditChecklist.newInstance(mContext, file.getAbsolutePath());
 				}
 			}
 		});
@@ -117,6 +117,7 @@ public class FilePicker extends SherlockActivity {
 		editPrompt.setView(editText);
 
 		editPrompt.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+		@Override
 		public void onClick(DialogInterface dialog, int whichButton) {
 			String fileName = editText.getText().toString();
 			if (!fileName.contains(".")) {
@@ -125,7 +126,7 @@ public class FilePicker extends SherlockActivity {
 			File newFile = new File(mFile, fileName);
 			try {
 				newFile.createNewFile();
-				EditChecklist.newInstance(mContext, newFile.toURI().toString());
+				EditChecklist.newInstance(mContext, newFile.getAbsolutePath());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -133,7 +134,8 @@ public class FilePicker extends SherlockActivity {
 		});
 
 		editPrompt.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-		  public void onClick(DialogInterface dialog, int whichButton) {
+		  @Override
+		public void onClick(DialogInterface dialog, int whichButton) {
 		  }
 		});
 		

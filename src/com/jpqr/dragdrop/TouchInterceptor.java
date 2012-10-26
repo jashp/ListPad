@@ -74,7 +74,7 @@ public class TouchInterceptor extends ListView {
 					int x = (int) ev.getX();
 					int y = (int) ev.getY();
 					int itemnum = pointToPosition(x, y);
-					if (itemnum == AdapterView.INVALID_POSITION || itemnum == getChildCount() - 1) {
+					if (itemnum == AdapterView.INVALID_POSITION || (itemnum - getFirstVisiblePosition()) == getChildCount() - 1) {
 						break;
 					}
 					ViewGroup item = (ViewGroup) getChildAt(itemnum - getFirstVisiblePosition());
@@ -290,8 +290,8 @@ public class TouchInterceptor extends ListView {
 		mWindowParams.x = 0;
 		mWindowParams.y = y - mDragPoint + mCoordOffset;
 
-		mWindowParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-		mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+		mWindowParams.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+		mWindowParams.width = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 		mWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 				| WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 		mWindowParams.format = PixelFormat.TRANSLUCENT;

@@ -1,5 +1,6 @@
 package com.jpqr.listpad.activities;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -64,24 +65,26 @@ public class EditChecklist extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 		mDataSource = new FilesDataSource(mContext);
-		mDataSource.open();
+		
 		
 		Uri pathUri = getIntent().getData();
 		String pathString = getIntent().getStringExtra(EXTRA_PATH);
-		URI pathURI;
 		try {
+			File file;
 			if (pathUri != null) {
-				pathURI = new URI(pathUri.toString());
+				file = new File(new URI(pathUri.toString()));
 			} else if (pathString != null) {
-				pathURI = new URI(pathString);
+				file = new File(pathString);
 			} else {
 				throw new URISyntaxException("null", "EditChecklist Activity must be opened with a path in the intent or the instance");
 			}
 
-			mChecklist = new Checklist(pathURI);
-			mPath = pathURI.toString();
+			mChecklist = new Checklist(file);
+			mPath = file.getAbsolutePath();
+			mDataSource.open();
 			mDataSource.addFile(mPath, FilesDataSource.Type.RECENT);
 			mIsFavourite = mDataSource.isFavourite(mPath);
+			mDataSource.close();
 		} catch (FileNotFoundException e) {
 			Toast.makeText(mContext, "File not found.", Toast.LENGTH_LONG).show();
 			e.printStackTrace();
@@ -113,6 +116,7 @@ public class EditChecklist extends SherlockActivity {
 		
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
+			@Override
 			public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 				AlertDialog.Builder editPrompt = new AlertDialog.Builder(mContext);
 				final TextView itemName = (TextView) view.findViewById(R.id.item_name);
@@ -121,6 +125,7 @@ public class EditChecklist extends SherlockActivity {
 				editPrompt.setView(editText);
 
 				editPrompt.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int whichButton) {
 					String value = editText.getText().toString();
 					itemName.setText(value);
@@ -129,7 +134,8 @@ public class EditChecklist extends SherlockActivity {
 				});
 
 				editPrompt.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-				  public void onClick(DialogInterface dialog, int whichButton) {
+				  @Override
+				public void onClick(DialogInterface dialog, int whichButton) {
 				  }
 				});
 				
@@ -139,6 +145,7 @@ public class EditChecklist extends SherlockActivity {
 
 		mAddItemField = (EditText) findViewById(R.id.add_item_field);
 		mAddItemField.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_NEXT) {
 					addToChecklist();
@@ -149,6 +156,7 @@ public class EditChecklist extends SherlockActivity {
 		});
 		ImageView addButton = (ImageView) findViewById(R.id.add_button);
 		addButton.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				addToChecklist();
 			}
@@ -168,6 +176,7 @@ public class EditChecklist extends SherlockActivity {
 			mAddItemField.setText("");
 			mAdapter.notifyDataSetChanged();
 		}
+		mListView.setSelection(mAdapter.getCount() - 2);
 	}
 
 	@Override
@@ -205,6 +214,7 @@ public class EditChecklist extends SherlockActivity {
 	private void delete() {
 		if (mDeleteDialog == null || mDeleteDialogBuilder == null) {
 			mDeleteDialog = new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					switch (which) {
 						case DialogInterface.BUTTON_POSITIVE:
@@ -245,6 +255,7 @@ public class EditChecklist extends SherlockActivity {
 	}
 
 	private void favourite(MenuItem item) {
+		mDataSource.open();
 		if (mIsFavourite) {
 			item.setIcon(R.drawable.ic_menu_star);
 			mDataSource.deleteFile(mPath, FilesDataSource.Type.FAVOURITE);
@@ -256,12 +267,14 @@ public class EditChecklist extends SherlockActivity {
 			mIsFavourite = true;
 			Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
 		}
+		mDataSource.close();
 	}
 
 	private void close() {
 		if (mChecklist.isModified()) {
 			if (mCloseDialog == null || mCloseDialogBuilder == null) {
 				mCloseDialog = new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
 							case DialogInterface.BUTTON_POSITIVE:
@@ -325,6 +338,7 @@ public class EditChecklist extends SherlockActivity {
 	}
 
 	private TouchInterceptor.DropListener mDropListener = new TouchInterceptor.DropListener() {
+		@Override
 		public void drop(int from, int to) {
 			ArrayList<String> list = mChecklist;
 			int size = list.size();

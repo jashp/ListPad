@@ -15,8 +15,6 @@
  */
 package com.jpqr.listpad.activities;
 
-import java.io.File;
-import java.io.FilePermission;
 import java.util.ArrayList;
 
 import android.content.Context;

@@ -1,14 +1,11 @@
 package com.jpqr.listpad.fragments;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -18,8 +15,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-
 import com.actionbarsherlock.app.SherlockFragment;
 import com.jpqr.adapters.FileListAdapter;
 import com.jpqr.listpad.R;
@@ -33,6 +28,7 @@ public class FolderFragment extends SherlockFragment {
 	private ArrayAdapter<File> mAdapter;
 
 
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.list_files_fragment, container, false);
 		mListView = (ListView) view.findViewById(R.id.files_list);
@@ -42,7 +38,7 @@ public class FolderFragment extends SherlockFragment {
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				EditChecklist.newInstance(getActivity(), mFiles.get(position).toURI().toString());
+				EditChecklist.newInstance(getActivity(), mFiles.get(position).getAbsolutePath());
 			}
 		});		
 		return view;
