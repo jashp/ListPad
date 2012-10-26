@@ -103,7 +103,7 @@ public class FilesDataSource {
 				throw new InputMismatchException("Invalid type of file reference");
 		}
 
-		Cursor cursor = database.query(table, new String[] { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_URI }, null, null, null, null, MySQLiteHelper.COLUMN_ID + " DESC", "LIMIT 20");
+		Cursor cursor = database.query(table, new String[] { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_URI }, null, null, null, null, MySQLiteHelper.COLUMN_ID + " DESC", "20");
 		ArrayList<File> files = new ArrayList<File>();
 		if (cursor.moveToFirst()) {
 			int index = cursor.getColumnIndex(MySQLiteHelper.COLUMN_URI);
