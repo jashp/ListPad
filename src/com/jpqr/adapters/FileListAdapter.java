@@ -32,9 +32,9 @@ public class FileListAdapter extends ArrayAdapter<File> {
 		File file = mFiles.get(position);
 		ImageView itemIcon = (ImageView) view.findViewById(R.id.file_icon);
 		if (file.isDirectory()) {
-			itemIcon.setImageResource(android.R.drawable.ic_menu_agenda);
+			itemIcon.setImageResource(R.drawable.ic_menu_archive);
 		} else if (file.isFile()) {
-			itemIcon.setImageResource(android.R.drawable.ic_menu_camera);
+			itemIcon.setImageResource(R.drawable.ic_menu_agenda);
 		}
 		TextView itemName = (TextView) view.findViewById(R.id.file_name);
 		itemName.setText(file.getName());

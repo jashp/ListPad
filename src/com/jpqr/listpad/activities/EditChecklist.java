@@ -175,7 +175,7 @@ public class EditChecklist extends SherlockActivity {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.edit_file_menu, menu);
 		MenuItem favouriteItem = menu.findItem(R.id.favourite);
-		favouriteItem.setIcon(mIsFavourite ? android.R.drawable.star_big_on : android.R.drawable.star_big_off);
+		favouriteItem.setIcon(mIsFavourite ? R.drawable.ic_menu_star : R.drawable.ic_menu_star_white);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -246,12 +246,12 @@ public class EditChecklist extends SherlockActivity {
 
 	private void favourite(MenuItem item) {
 		if (mIsFavourite) {
-			item.setIcon(android.R.drawable.star_big_off);
+			item.setIcon(R.drawable.ic_menu_star);
 			mDataSource.deleteFile(mPath, FilesDataSource.Type.FAVOURITE);
 			mIsFavourite = false;
 			Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
 		} else {
-			item.setIcon(android.R.drawable.star_big_on);
+			item.setIcon(R.drawable.ic_menu_star_white);
 			mDataSource.addFile(mPath, FilesDataSource.Type.FAVOURITE);
 			mIsFavourite = true;
 			Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();

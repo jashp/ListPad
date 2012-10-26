@@ -2,17 +2,17 @@
 
     <item
         android:id="@+id/favourite"
-        android:icon="@android:drawable/star_big_off"
+        android:icon="@drawable/ic_menu_star"
         android:orderInCategory="100"
         android:showAsAction="always"/>
     <item
         android:id="@+id/save"
-        android:icon="@android:drawable/ic_menu_save"
+        android:icon="@drawable/ic_menu_save"
         android:orderInCategory="101"
         android:showAsAction="always"/>
     <item
         android:id="@+id/switch_mode"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/ic_menu_edit"
         android:orderInCategory="102"
         android:showAsAction="always"/>
     <item

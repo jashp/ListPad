@@ -19,7 +19,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_input_add" />
+            android:src="@drawable/ic_menu_add" />
 
         <EditText
             android:id="@+id/add_item_field"

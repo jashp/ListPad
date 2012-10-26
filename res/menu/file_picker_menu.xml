@@ -13,12 +13,10 @@
     <item
         android:id="@+id/new_file"
         android:orderInCategory="102"
-        android:showAsAction="always"
-        android:title="New" />
+        android:title="Create File"/>
     <item
         android:id="@+id/close"
-        android:orderInCategory="102"
-        android:showAsAction="always"
+        android:orderInCategory="103"
         android:title="Close"/>
 
 </menu>
