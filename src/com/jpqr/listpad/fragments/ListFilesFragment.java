@@ -23,16 +23,13 @@ public class ListFilesFragment extends SherlockFragment {
 	private ArrayList<File> mFiles;
 	private int mType;
 	private FilesDataSource mDataSource;
-
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-	}
+	private View mEmptyText;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.list_files_fragment, container, false);
 		mListView = (ListView) view.findViewById(R.id.files_list);
+		mEmptyText = view.findViewById(R.id.empty_text);
 		mDataSource = new FilesDataSource(getActivity());
 		mDataSource.open();
 
@@ -47,6 +44,7 @@ public class ListFilesFragment extends SherlockFragment {
 			}
 
 		});
+		updateEmptyText();
 		mDataSource.close();
 		return view;
 	}
@@ -59,8 +57,17 @@ public class ListFilesFragment extends SherlockFragment {
 		mFiles.clear();
 		mFiles.addAll(mDataSource.getAllFiles(mType));
 		mListView.invalidateViews();
+		updateEmptyText();
 		mDataSource.close();
 
+	}
+	
+	private void updateEmptyText() {
+		if (mFiles.size() == 0) {
+			mEmptyText.setVisibility(View.VISIBLE);
+		} else {
+			mEmptyText.setVisibility(View.GONE);
+		}
 	}
 
 }

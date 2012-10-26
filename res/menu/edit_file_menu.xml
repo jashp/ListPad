@@ -2,7 +2,7 @@
 
     <item
         android:id="@+id/favourite"
-        android:icon="@drawable/ic_menu_star"
+        android:icon="@drawable/btn_star_big_off"
         android:orderInCategory="100"
         android:showAsAction="always"/>
     <item

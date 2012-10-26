@@ -1,18 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-
+    android:layout_height="match_parent" >
+    
+    
     <TextView
-        android:id="@+id/current_dir_label"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:id="@+id/empty_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="There is nothing here. :("
+        android:visibility="gone" />
+    
 
     <ListView
         android:id="@+id/list_files"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/file_picker_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/file_picker_header"
+        android:background="@color/ics_grey"
+        android:padding="5dp" >
+
+        <ImageView
+            android:id="@+id/folder_back"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_menu_back" />
+
+        <ImageView
+            android:id="@+id/folder_forward"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_toRightOf="@+id/folder_back"
+            android:src="@drawable/ic_menu_forward" />
+
+        <TextView
+            android:id="@+id/current_dir_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/file_add"
+            android:layout_toRightOf="@+id/folder_forward"
+            android:ellipsize="start"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/file_add"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_menu_add" />
+    </RelativeLayout>
+
+</RelativeLayout>

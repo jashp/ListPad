@@ -61,11 +61,11 @@ public class MainActivity extends SherlockFragmentActivity {
 
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
-		mTabsAdapter.addTab(mTabHost.newTabSpec("folder").setIndicator("Folder"), FolderFragment.class, new Bundle());
+		mTabsAdapter.addTab(mTabHost.newTabSpec("browse").setIndicator("Browse"), FilePicker.class, new Bundle());
 
 		Bundle favourite = new Bundle();
 		favourite.putInt(ListFilesFragment.ARG_TYPE, FilesDataSource.Type.FAVOURITE);
-		mTabsAdapter.addTab(mTabHost.newTabSpec("favourite").setIndicator("Favourite"), ListFilesFragment.class, favourite);
+		mTabsAdapter.addTab(mTabHost.newTabSpec("favourite").setIndicator("Favorites"), ListFilesFragment.class, favourite);
 
 		Bundle recent = new Bundle();
 		recent.putInt(ListFilesFragment.ARG_TYPE, FilesDataSource.Type.RECENT);
@@ -84,23 +84,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		outState.putString("tab", mTabHost.getCurrentTabTag());
 	}
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.activity_main, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.browse:
-				FilePicker.newInstance(this);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
 
 	/**
 	 * This is a helper class that implements the management of tabs and all

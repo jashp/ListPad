@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <TextView
+        android:id="@+id/empty_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="There is nothing here. :("
+        android:visibility="gone" />
+
     <ListView
         android:id="@+id/files_list"
         android:layout_width="match_parent"

@@ -11,8 +11,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -20,16 +22,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.jpqr.adapters.FileListAdapter;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.activities.EditChecklist;
 import com.jpqr.listpad.models.Checklist;
 
-public class FilePicker extends SherlockActivity {
+public class FilePicker extends SherlockFragment {
 
 	private File mFile;
 	private ArrayList<File> mFiles;
@@ -38,24 +37,27 @@ public class FilePicker extends SherlockActivity {
 	private Context mContext;
 	private ArrayAdapter<File> mAdapter;
 	private Stack<File> mForwardStack;
-	
+	private View mEmptyText;
+
 	public static void newInstance(Context context) {
 		Intent intent = new Intent(context, FilePicker.class);
 		context.startActivity(intent);
 	}
-	
+
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		mContext = this;
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mContext = getActivity();
 		mFile = new File(Checklist.DEFAULT_DIRECTORY);
 		mFiles = new ArrayList<File>();
-		mAdapter = new FileListAdapter(this, mFiles);
+		mAdapter = new FileListAdapter(mContext, mFiles);
 		mForwardStack = new Stack<File>();
+
+		View view = inflater.inflate(R.layout.file_picker, container, false);
+
+		mLabel = (TextView) view.findViewById(R.id.current_dir_label);
+		mEmptyText = view.findViewById(R.id.empty_text);
 		
-		setContentView(R.layout.file_picker);
-		mLabel = (TextView) findViewById(R.id.current_dir_label);
-		mListView = (ListView) findViewById(R.id.list_files);
+		mListView = (ListView) view.findViewById(R.id.list_files);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -70,13 +72,46 @@ public class FilePicker extends SherlockActivity {
 			}
 		});
 		mListView.setAdapter(mAdapter);
+
+		view.findViewById(R.id.folder_back).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				back();
+			}
+		});
+
+		view.findViewById(R.id.folder_forward).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				forward();
+			}
+		});
+
+		view.findViewById(R.id.file_add).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				newFile();
+			}
+		});
+
 		updateDir();
+		
+
+		return view;
 	}
-	
+
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		updateDir();
 		super.onResume();
+	}
+	
+	private void updateEmptyText() {
+		if (mFiles.size() == 0) {
+			mEmptyText.setVisibility(View.VISIBLE);
+		} else {
+			mEmptyText.setVisibility(View.GONE);
+		}
 	}
 
 	private void updateDir() {
@@ -84,30 +119,8 @@ public class FilePicker extends SherlockActivity {
 		mFiles.clear();
 		mFiles.addAll(Arrays.asList(mFile.listFiles()));
 		mAdapter.notifyDataSetChanged();
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.file_picker_menu, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.back:
-				back();
-				return true;
-			case R.id.forward:
-				forward();
-				return true;
-			case R.id.new_file:
-				newFile();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
+		
+		updateEmptyText();
 	}
 
 	private void newFile() {
@@ -117,31 +130,30 @@ public class FilePicker extends SherlockActivity {
 		editPrompt.setView(editText);
 
 		editPrompt.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int whichButton) {
-			String fileName = editText.getText().toString();
-			if (!fileName.contains(".")) {
-				fileName += ".txt";
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String fileName = editText.getText().toString();
+				if (!fileName.contains(".")) {
+					fileName += ".txt";
+				}
+				File newFile = new File(mFile, fileName);
+				try {
+					newFile.createNewFile();
+					EditChecklist.newInstance(mContext, newFile.getAbsolutePath());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
-			File newFile = new File(mFile, fileName);
-			try {
-				newFile.createNewFile();
-				EditChecklist.newInstance(mContext, newFile.getAbsolutePath());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		  }
 		});
 
 		editPrompt.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-		  @Override
-		public void onClick(DialogInterface dialog, int whichButton) {
-		  }
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+			}
 		});
-		
+
 		editPrompt.show();
 	}
-	
 
 	private void back() {
 		File parent = mFile.getParentFile();
@@ -149,8 +161,6 @@ public class FilePicker extends SherlockActivity {
 			mForwardStack.push(mFile);
 			mFile = parent;
 			updateDir();
-		} else {
-			finish();
 		}
 	}
 
@@ -159,16 +169,6 @@ public class FilePicker extends SherlockActivity {
 			mFile = mForwardStack.pop();
 			updateDir();
 		}
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		switch (keyCode) {
-			case KeyEvent.KEYCODE_BACK:
-				back();
-			break;
-		}
-		return true;
 	}
 
 }

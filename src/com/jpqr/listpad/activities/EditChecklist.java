@@ -166,7 +166,6 @@ public class EditChecklist extends SherlockActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		// save();
 	}
 
 	private void addToChecklist() {
@@ -184,7 +183,7 @@ public class EditChecklist extends SherlockActivity {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.edit_file_menu, menu);
 		MenuItem favouriteItem = menu.findItem(R.id.favourite);
-		favouriteItem.setIcon(mIsFavourite ? R.drawable.ic_menu_star : R.drawable.ic_menu_star_white);
+		favouriteItem.setIcon(mIsFavourite ? R.drawable.btn_star_big_on : R.drawable.btn_star_big_off);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -257,14 +256,14 @@ public class EditChecklist extends SherlockActivity {
 	private void favourite(MenuItem item) {
 		mDataSource.open();
 		if (mIsFavourite) {
-			item.setIcon(R.drawable.ic_menu_star);
-			mDataSource.deleteFile(mPath, FilesDataSource.Type.FAVOURITE);
 			mIsFavourite = false;
+			item.setIcon(R.drawable.btn_star_big_off);
+			mDataSource.deleteFile(mPath, FilesDataSource.Type.FAVOURITE);
 			Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
 		} else {
-			item.setIcon(R.drawable.ic_menu_star_white);
-			mDataSource.addFile(mPath, FilesDataSource.Type.FAVOURITE);
 			mIsFavourite = true;
+			item.setIcon(R.drawable.btn_star_big_on);
+			mDataSource.addFile(mPath, FilesDataSource.Type.FAVOURITE);
 			Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
 		}
 		mDataSource.close();
