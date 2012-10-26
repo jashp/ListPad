@@ -1,9 +1,12 @@
 package com.jpqr.listpad.fragments;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -33,7 +36,7 @@ public class FolderFragment extends SherlockFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.list_files_fragment, container, false);
 		mListView = (ListView) view.findViewById(R.id.files_list);
-		mAdapter = new FileListAdapter(getActivity(), mFiles, true);
+		mAdapter = new FileListAdapter(getActivity(), mFiles);
 		
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
@@ -51,7 +54,21 @@ public class FolderFragment extends SherlockFragment {
 		super.onResume();
 		refreshChecklists();
 	}
-
+	
+	private ArrayList<File> getAllFiles(File dir) {
+		ArrayList<File> allFiles = new ArrayList<File>();
+		File[] children = dir.listFiles();
+		
+		for (File child : children) {
+			if (child.isDirectory()) {
+				allFiles.addAll(getAllFiles(child));
+			} else if (child.isFile()) {
+				allFiles.add(child);
+			}
+		}
+		
+		return allFiles;
+	}
 
 
 	private void refreshChecklists() {
@@ -76,8 +93,13 @@ public class FolderFragment extends SherlockFragment {
 		}
 
 		mFiles.clear();
-		File[] files = dir.listFiles();
-		mFiles.addAll(Arrays.asList(files));
+		mFiles.addAll(getAllFiles(dir));
+		Collections.sort(mFiles, new Comparator<File>() {
+			@Override
+			public int compare(File lhs, File rhs) {
+				return (int) (lhs.lastModified() - rhs.lastModified());
+			}
+		});
 		mAdapter.notifyDataSetChanged();
 
 	}

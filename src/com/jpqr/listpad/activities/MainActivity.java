@@ -15,6 +15,8 @@
  */
 package com.jpqr.listpad.activities;
 
+import java.io.File;
+import java.io.FilePermission;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -29,6 +31,10 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.jpqr.filepicker.FilePicker;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.db.FilesDataSource;
 import com.jpqr.listpad.fragments.FolderFragment;
@@ -78,6 +84,24 @@ public class MainActivity extends SherlockFragmentActivity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putString("tab", mTabHost.getCurrentTabTag());
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.activity_main, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.browse:
+				FilePicker.newInstance(this);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 	/**

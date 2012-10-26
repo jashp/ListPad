@@ -71,6 +71,11 @@ public class Checklist extends ArrayList<String> {
 	
 	public String toString() {
 		ArrayList<String> list = getList();
+		
+		if (list.isEmpty()) {
+			return "";
+		}
+		
 		StringBuilder stringBuilder = new StringBuilder();
 		for (String item : list) {
 			stringBuilder.append(item.trim() + mDelimiter);

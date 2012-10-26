@@ -8,19 +8,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.jpqr.listpad.R;
 
 
 
 public class FileListAdapter extends ArrayAdapter<File> {
-	private final static int RESOURCE_ID = android.R.layout.simple_list_item_1;
-	private boolean mOnlyFiles;
 	private ArrayList<File> mFiles;
 	
-	public FileListAdapter(Context context, ArrayList<File> files, boolean onlyFiles) {
-		super(context, RESOURCE_ID, files);
-		mOnlyFiles = onlyFiles;
+	public FileListAdapter(Context context, ArrayList<File> files) {
+		super(context, R.layout.file_list_item, files);
 		mFiles = files;
 	}
 
@@ -28,10 +27,17 @@ public class FileListAdapter extends ArrayAdapter<File> {
 	public View getView(final int position, View view, ViewGroup parent) {
 		if (view == null) {
 			LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			view = inflater.inflate(RESOURCE_ID, null);
+			view = inflater.inflate(R.layout.file_list_item, null);
 		}
-		TextView itemName = (TextView) view.findViewById(android.R.id.text1);
-		itemName.setText(mFiles.get(position).getName());
+		File file = mFiles.get(position);
+		ImageView itemIcon = (ImageView) view.findViewById(R.id.file_icon);
+		if (file.isDirectory()) {
+			itemIcon.setImageResource(android.R.drawable.ic_menu_agenda);
+		} else if (file.isFile()) {
+			itemIcon.setImageResource(android.R.drawable.ic_menu_camera);
+		}
+		TextView itemName = (TextView) view.findViewById(R.id.file_name);
+		itemName.setText(file.getName());
 
 		return view;
 	}
