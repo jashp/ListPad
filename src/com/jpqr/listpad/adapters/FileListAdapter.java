@@ -1,4 +1,4 @@
-package com.jpqr.adapters;
+package com.jpqr.listpad.adapters;
 
 import java.io.File;
 import java.util.ArrayList;

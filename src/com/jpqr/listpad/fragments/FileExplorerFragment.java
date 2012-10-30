@@ -1,6 +1,7 @@
-package com.jpqr.filepicker;
+package com.jpqr.listpad.fragments;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,12 +26,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.jpqr.adapters.FileListAdapter;
+import com.actionbarsherlock.view.Menu;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.activities.EditChecklist;
+import com.jpqr.listpad.adapters.FileListAdapter;
 import com.jpqr.listpad.models.Checklist;
 
-public class FilePicker extends SherlockFragment {
+public class FileExplorerFragment extends SherlockFragment {
 
 	private File mFile;
 	private ArrayList<File> mFiles;
@@ -40,7 +44,7 @@ public class FilePicker extends SherlockFragment {
 	private View mEmptyText;
 
 	public static void newInstance(Context context) {
-		Intent intent = new Intent(context, FilePicker.class);
+		Intent intent = new Intent(context, FileExplorerFragment.class);
 		context.startActivity(intent);
 	}
 
@@ -56,21 +60,18 @@ public class FilePicker extends SherlockFragment {
 
 		mLabel = (TextView) view.findViewById(R.id.current_dir_label);
 		mEmptyText = view.findViewById(R.id.empty_text);
-		
+
 		mListView = (ListView) view.findViewById(R.id.list_files);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				File file = mFiles.get(position);
-				if (file.isDirectory()) {
-					mFile = file;
-					updateDir();
-					mForwardStack.clear();
-				} else {
-					EditChecklist.newInstance(mContext, file.getAbsolutePath());
-				}
+				open(mFiles.get(position));
+
 			}
 		});
+
+		registerForContextMenu(mListView);
+
 		mListView.setAdapter(mAdapter);
 
 		view.findViewById(R.id.folder_back).setOnClickListener(new OnClickListener() {
@@ -95,9 +96,36 @@ public class FilePicker extends SherlockFragment {
 		});
 
 		updateDir();
-		
 
 		return view;
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
+		if (view.getId() == R.id.list_files) {
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+			menu.setHeaderTitle(mFiles.get(info.position).getName());
+			String[] menuItems = new String[] { "Open", "Delete" };
+			for (int i = 0; i < menuItems.length; i++) {
+				menu.add(Menu.NONE, i, i, menuItems[i]);
+			}
+		}
+	}
+
+	@Override
+	public boolean onContextItemSelected(android.view.MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		File file = mFiles.get(info.position);
+		switch (item.getItemId()) {
+			case 0:
+				open(file);
+			break;
+			case 1:
+				file.delete();
+				updateDir();
+			break;
+		}
+		return super.onContextItemSelected(item);
 	}
 
 	@Override
@@ -105,7 +133,7 @@ public class FilePicker extends SherlockFragment {
 		updateDir();
 		super.onResume();
 	}
-	
+
 	private void updateEmptyText() {
 		if (mFiles.size() == 0) {
 			mEmptyText.setVisibility(View.VISIBLE);
@@ -117,11 +145,28 @@ public class FilePicker extends SherlockFragment {
 	private void updateDir() {
 		mLabel.setText(mFile.getPath());
 		mFiles.clear();
-		File[] files = mFile.listFiles();
+
+		File[] dirs = mFile.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				return file.isDirectory();
+			}
+		});
+		if (dirs != null) {
+			mFiles.addAll(Arrays.asList(dirs));
+		}
+
+		File[] files = mFile.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				return file.isFile();
+			}
+		});
 		if (files != null) {
 			mFiles.addAll(Arrays.asList(files));
-			mAdapter.notifyDataSetChanged();
 		}
+
+		mAdapter.notifyDataSetChanged();
 		updateEmptyText();
 	}
 
@@ -141,7 +186,7 @@ public class FilePicker extends SherlockFragment {
 				File newFile = new File(mFile, fileName);
 				try {
 					newFile.createNewFile();
-					EditChecklist.newInstance(mContext, newFile.getAbsolutePath());
+					open(newFile);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -173,4 +218,13 @@ public class FilePicker extends SherlockFragment {
 		}
 	}
 
+	private void open(File file) {
+		if (file.isFile()) {
+			EditChecklist.newInstance(mContext, file.getAbsolutePath());
+		} else if (file.isDirectory()) {
+			mForwardStack.clear();
+			mFile = file;
+			updateDir();
+		}
+	}
 }

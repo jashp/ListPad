@@ -31,10 +31,10 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.jpqr.adapters.ChecklistAdapter;
-import com.jpqr.dragdrop.TouchInterceptor;
 import com.jpqr.listpad.R;
-import com.jpqr.listpad.db.FilesDataSource;
+import com.jpqr.listpad.adapters.ChecklistAdapter;
+import com.jpqr.listpad.database.FilesDataSource;
+import com.jpqr.listpad.dragdrop.TouchInterceptor;
 import com.jpqr.listpad.models.Checklist;
 
 public class EditChecklist extends SherlockActivity {

@@ -12,7 +12,7 @@
         android:hint="Name"
         android:textSize="20sp" />
 
-    <com.jpqr.dragdrop.TouchInterceptor
+    <com.jpqr.listpad.dragdrop.TouchInterceptor
         android:id="@+id/list_field"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

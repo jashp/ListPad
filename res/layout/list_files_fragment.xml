@@ -13,7 +13,7 @@
         android:visibility="gone" />
 
     <ListView
-        android:id="@+id/files_list"
+        android:id="@+id/list_files"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

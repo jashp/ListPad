@@ -29,13 +29,9 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.jpqr.filepicker.FilePicker;
 import com.jpqr.listpad.R;
-import com.jpqr.listpad.db.FilesDataSource;
-import com.jpqr.listpad.fragments.FolderFragment;
+import com.jpqr.listpad.database.FilesDataSource;
+import com.jpqr.listpad.fragments.FileExplorerFragment;
 import com.jpqr.listpad.fragments.ListFilesFragment;
 
 /**
@@ -61,7 +57,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
 		mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
-		mTabsAdapter.addTab(mTabHost.newTabSpec("browse").setIndicator("Browse"), FilePicker.class, new Bundle());
+		mTabsAdapter.addTab(mTabHost.newTabSpec("browse").setIndicator("Browse"), FileExplorerFragment.class, new Bundle());
 
 		Bundle favourite = new Bundle();
 		favourite.putInt(ListFilesFragment.ARG_TYPE, FilesDataSource.Type.FAVOURITE);

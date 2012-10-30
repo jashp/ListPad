@@ -1,4 +1,4 @@
-package com.jpqr.adapters;
+package com.jpqr.listpad.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

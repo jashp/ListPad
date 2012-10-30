@@ -15,10 +15,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import com.actionbarsherlock.app.SherlockFragment;
-import com.jpqr.adapters.FileListAdapter;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.activities.EditChecklist;
+import com.jpqr.listpad.adapters.FileListAdapter;
 import com.jpqr.listpad.models.Checklist;
 
 
@@ -31,7 +32,7 @@ public class FolderFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.list_files_fragment, container, false);
-		mListView = (ListView) view.findViewById(R.id.files_list);
+		mListView = (ListView) view.findViewById(R.id.list_files);
 		mAdapter = new FileListAdapter(getActivity(), mFiles);
 		
 		mListView.setAdapter(mAdapter);

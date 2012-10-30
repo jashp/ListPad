@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jpqr.dragdrop;
+package com.jpqr.listpad.dragdrop;
 
 import android.content.Context;
 import android.content.res.Resources;
