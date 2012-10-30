@@ -117,9 +117,11 @@ public class FilePicker extends SherlockFragment {
 	private void updateDir() {
 		mLabel.setText(mFile.getPath());
 		mFiles.clear();
-		mFiles.addAll(Arrays.asList(mFile.listFiles()));
-		mAdapter.notifyDataSetChanged();
-		
+		File[] files = mFile.listFiles();
+		if (files != null) {
+			mFiles.addAll(Arrays.asList(files));
+			mAdapter.notifyDataSetChanged();
+		}
 		updateEmptyText();
 	}
 

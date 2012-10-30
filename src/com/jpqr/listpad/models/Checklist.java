@@ -14,7 +14,7 @@ import android.os.Environment;
 public class Checklist extends ArrayList<String> {
 
 	private static final long serialVersionUID = -4776403069516340972L;
-	public static final String DEFAULT_DIRECTORY = Environment.getExternalStorageDirectory().toString() + "/ListPad/";
+	public static final String DEFAULT_DIRECTORY = Environment.getExternalStorageDirectory().toString();
 	private String mTitle;
 	private File mFile;
 	private String mDelimiter = "\n";

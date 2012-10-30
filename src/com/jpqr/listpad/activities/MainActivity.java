@@ -50,7 +50,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// setTheme(SampleList.THEME); //Used for theme switching in samples
+//		setTheme(SampleList.THEME); //Used for theme switching in samples
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.fragment_tabs_pager);

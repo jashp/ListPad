@@ -18,7 +18,8 @@
         android:id="@+id/list_files"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true" 
+        android:layout_above="@+id/file_picker_header" />
 
     <RelativeLayout
         android:id="@+id/file_picker_header"
