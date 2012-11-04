@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.jpqr.listpad.R;
-import com.jpqr.listpad.activities.EditChecklist;
+import com.jpqr.listpad.activities.EditActivity;
 import com.jpqr.listpad.adapters.FileListAdapter;
 import com.jpqr.listpad.database.FilesDataSource;
 
@@ -43,7 +43,7 @@ public class ListFilesFragment extends SherlockFragment {
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				EditChecklist.newInstance(getActivity(), mFiles.get(position).getAbsolutePath());
+				EditActivity.newInstance(getActivity(), mFiles.get(position).getAbsolutePath());
 			}
 
 		});

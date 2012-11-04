@@ -99,4 +99,10 @@ public class Checklist extends ArrayList<String> {
 	public boolean isModified() {
 		return !(mOriginalText.equals(toString()));
 	}
+	
+
+	public static boolean isFilenameValid(String fileName) {
+		// TODO check filename
+		return true;
+	}
 }

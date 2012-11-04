@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
@@ -37,7 +38,7 @@ import com.jpqr.listpad.database.FilesDataSource;
 import com.jpqr.listpad.dragdrop.TouchInterceptor;
 import com.jpqr.listpad.models.Checklist;
 
-public class EditChecklist extends SherlockActivity {
+public class EditActivity extends SherlockActivity {
 	public static final String EXTRA_PATH = "PATH";
 	private ChecklistAdapter mAdapter;
 	private Checklist mChecklist;
@@ -48,14 +49,11 @@ public class EditChecklist extends SherlockActivity {
 	private boolean mIsFavourite;
 	private EditText mChecklistTextField;
 	private String mPath;
-	private DialogInterface.OnClickListener mDeleteDialog;
-	private DialogInterface.OnClickListener mCloseDialog;
 	private FilesDataSource mDataSource;
-
 	private EditText mAddItemField;
 
 	public static void newInstance(Context context, String path) {
-		Intent intent = new Intent(context, EditChecklist.class);
+		Intent intent = new Intent(context, EditActivity.class);
 		intent.putExtra(EXTRA_PATH, path);
 		context.startActivity(intent);
 	}
@@ -65,12 +63,11 @@ public class EditChecklist extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 		mDataSource = new FilesDataSource(mContext);
-		
-		
+
 		Uri pathUri = getIntent().getData();
 		String pathString = getIntent().getStringExtra(EXTRA_PATH);
+		File file = null;
 		try {
-			File file;
 			if (pathUri != null) {
 				file = new File(new URI(pathUri.toString()));
 			} else if (pathString != null) {
@@ -78,104 +75,11 @@ public class EditChecklist extends SherlockActivity {
 			} else {
 				throw new URISyntaxException("null", "EditChecklist Activity must be opened with a path in the intent or the instance");
 			}
-
-			mChecklist = new Checklist(file);
-			mPath = file.getAbsolutePath();
-			mDataSource.open();
-			mDataSource.addFile(mPath, FilesDataSource.Type.RECENT);
-			mIsFavourite = mDataSource.isFavourite(mPath);
-			mDataSource.close();
-		} catch (FileNotFoundException e) {
-			Toast.makeText(mContext, "File not found.", Toast.LENGTH_LONG).show();
-			e.printStackTrace();
-		} catch (IOException e) {
-			Toast.makeText(mContext, "Input/output problem.", Toast.LENGTH_LONG).show();
-			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			Toast.makeText(mContext, "Problem with file path.", Toast.LENGTH_LONG).show();
 			e.printStackTrace();
 		}
-
-		setContentView(R.layout.edit_checklist_activity);
-		mListView = (ListView) findViewById(R.id.list_field);
-
-		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-		((TouchInterceptor) mListView).setDropListener(mDropListener);
-
-		View addItemView = inflater.inflate(R.layout.checklist_new_item, null);
-		mListView.addFooterView(addItemView);
-
-		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
-		mChecklistNameField.setText(mChecklist.getTitle());
-
-		mChecklistTextField = (EditText) findViewById(R.id.text_field);
-
-		mAdapter = new ChecklistAdapter(mContext, mChecklist, R.layout.checklist_edit_item);
-		mListView.setAdapter(mAdapter);
-		
-		mListView.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-				AlertDialog.Builder editPrompt = new AlertDialog.Builder(mContext);
-				final TextView itemName = (TextView) view.findViewById(R.id.item_name);
-				final EditText editText = new EditText(mContext);
-				editText.setText(itemName.getText());
-				editPrompt.setView(editText);
-
-				editPrompt.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int whichButton) {
-					String value = editText.getText().toString();
-					itemName.setText(value);
-					mChecklist.set(position, value);
-				  }
-				});
-
-				editPrompt.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-				  @Override
-				public void onClick(DialogInterface dialog, int whichButton) {
-				  }
-				});
-				
-				editPrompt.show();
-			}
-		});
-
-		mAddItemField = (EditText) findViewById(R.id.add_item_field);
-		mAddItemField.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_NEXT) {
-					addToChecklist();
-					return true;
-				}
-				return false;
-			}
-		});
-		ImageView addButton = (ImageView) findViewById(R.id.add_button);
-		addButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				addToChecklist();
-			}
-		});
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-	}
-
-	private void addToChecklist() {
-		String itemToAdd = mAddItemField.getText().toString();
-		if (!itemToAdd.equals("")) {
-			mChecklist.add(itemToAdd);
-			mAddItemField.setText("");
-			mAdapter.notifyDataSetChanged();
-		}
-		mListView.setSelection(mAdapter.getCount() - 2);
+		checkFile(file);
 	}
 
 	@Override
@@ -210,32 +114,151 @@ public class EditChecklist extends SherlockActivity {
 		}
 	}
 
-	private void delete() {
-		if (mDeleteDialog == null || mDeleteDialogBuilder == null) {
-			mDeleteDialog = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					switch (which) {
-						case DialogInterface.BUTTON_POSITIVE:
-							if (mChecklist.delete()) {
-								finish();
-								Toast.makeText(mContext, "File deleted.", Toast.LENGTH_LONG).show();
-							} else {
-								Toast.makeText(mContext, "Problem deleting file.", Toast.LENGTH_LONG).show();
-							}
-						break;
-
-						case DialogInterface.BUTTON_NEGATIVE:
-						break;
-					}
-				}
-			};
-			mDeleteDialogBuilder = new AlertDialog.Builder(mContext);
-			mDeleteDialogBuilder.setMessage("Are you sure you want to delete this file?");
-			mDeleteDialogBuilder.setPositiveButton("Yes", mDeleteDialog);
-			mDeleteDialogBuilder.setNegativeButton("No", mDeleteDialog);
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+			case KeyEvent.KEYCODE_BACK:
+				close();
+			break;
 		}
-		mDeleteDialogBuilder.show();
+		return super.onKeyDown(keyCode, event);
+	}
+
+	private void checkFile(File file) {
+		if (file.isDirectory() || !file.exists()) {
+			Toast.makeText(mContext, "This is not a file", Toast.LENGTH_LONG).show();
+			finish();
+		}
+
+		String fileExtension = MimeTypeMap.getFileExtensionFromUrl(file.toURI().toString());
+		String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+		if (mimeType == null || !mimeType.matches("text/.+")) {
+			confirmFileOpen("This file is not a standard plain-text file. Do you still want to open it?", file);
+		} else if (file.length() > 1024) {
+			confirmFileOpen("This file may be too large for ListPad. Do you still want to open it?", file);
+		} else {
+			setUpChecklist(file);
+			setUpViews();
+		}
+	}
+
+	private void confirmFileOpen(String msg, final File file) {
+		AlertDialog.Builder oddFileDialogBuilder = new AlertDialog.Builder(mContext);
+		DialogInterface.OnClickListener oddFileDialog = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which) {
+					case DialogInterface.BUTTON_POSITIVE:
+						setUpChecklist(file);
+						setUpViews();
+					break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						finish();
+					break;
+				}
+			}
+		};
+		oddFileDialogBuilder.setPositiveButton("Yes", oddFileDialog);
+		oddFileDialogBuilder.setNegativeButton("No", oddFileDialog);
+		oddFileDialogBuilder.setMessage(msg);
+		oddFileDialogBuilder.show();
+
+	}
+
+	private void setUpChecklist(File file) {
+		try {
+			mChecklist = new Checklist(file);
+		} catch (FileNotFoundException e) {
+			Toast.makeText(mContext, "File not found.", Toast.LENGTH_LONG).show();
+			e.printStackTrace();
+		} catch (IOException e) {
+			Toast.makeText(mContext, "Input/output problem.", Toast.LENGTH_LONG).show();
+			e.printStackTrace();
+		}
+		mPath = file.getAbsolutePath();
+		mDataSource.open();
+		mDataSource.addFile(mPath, FilesDataSource.Type.RECENT);
+		mIsFavourite = mDataSource.isFavourite(mPath);
+		mDataSource.close();
+	}
+
+	private void setUpViews() {
+		setContentView(R.layout.edit_checklist_activity);
+		mListView = (ListView) findViewById(R.id.list_field);
+
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		((TouchInterceptor) mListView).setDropListener(mDropListener);
+
+		View addItemView = inflater.inflate(R.layout.checklist_new_item, null);
+		mListView.addFooterView(addItemView);
+
+		mChecklistNameField = (EditText) findViewById(R.id.checklist_title);
+		mChecklistNameField.setText(mChecklist.getTitle());
+
+		mChecklistTextField = (EditText) findViewById(R.id.text_field);
+
+		mAdapter = new ChecklistAdapter(mContext, mChecklist, R.layout.checklist_edit_item);
+		mListView.setAdapter(mAdapter);
+
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+				AlertDialog.Builder editPrompt = new AlertDialog.Builder(mContext);
+				final TextView itemName = (TextView) view.findViewById(R.id.item_name);
+				final EditText editText = new EditText(mContext);
+				editText.setText(itemName.getText());
+				editPrompt.setView(editText);
+
+				editPrompt.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = editText.getText().toString();
+						itemName.setText(value);
+						mChecklist.set(position, value);
+					}
+				});
+
+				editPrompt.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int whichButton) {
+					}
+				});
+
+				editPrompt.show();
+			}
+		});
+
+		mAddItemField = (EditText) findViewById(R.id.add_item_field);
+		mAddItemField.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_NEXT) {
+					addToChecklist();
+					return true;
+				}
+				return false;
+			}
+		});
+		ImageView addButton = (ImageView) findViewById(R.id.add_button);
+		addButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				addToChecklist();
+			}
+		});
+	}
+
+	private void addToChecklist() {
+		String itemToAdd = mAddItemField.getText().toString();
+		if (!itemToAdd.equals("")) {
+			mChecklist.add(itemToAdd);
+			mAddItemField.setText("");
+			mAdapter.notifyDataSetChanged();
+		}
+		mListView.setSelection(mAdapter.getCount() - 2);
 	}
 
 	private void switchMode() {
@@ -250,6 +273,26 @@ public class EditChecklist extends SherlockActivity {
 			mListView.setVisibility(View.VISIBLE);
 			mAdapter.notifyDataSetChanged();
 			mListModeActive = true;
+		}
+	}
+
+	private boolean save() {
+		String fileName = mChecklistNameField.getText().toString().trim();
+
+		if (!Checklist.isFilenameValid(fileName)) {
+			Toast.makeText(mContext, "The list name is not valid.", Toast.LENGTH_LONG).show();
+			return false;
+		}
+
+		mChecklist.setTitle(fileName);
+		try {
+			mChecklist.toFile();
+			Toast.makeText(mContext, "List saved.", Toast.LENGTH_SHORT).show();
+			return true;
+		} catch (IOException e) {
+			Toast.makeText(mContext, "Problem saving file.", Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
+			return false;
 		}
 	}
 
@@ -269,71 +312,65 @@ public class EditChecklist extends SherlockActivity {
 		mDataSource.close();
 	}
 
+	private void delete() {
+		AlertDialog.Builder deleteDialogBuilder;
+		DialogInterface.OnClickListener deleteDialog;
+		deleteDialog = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which) {
+					case DialogInterface.BUTTON_POSITIVE:
+						if (mChecklist.delete()) {
+							finish();
+							Toast.makeText(mContext, "File deleted.", Toast.LENGTH_LONG).show();
+						} else {
+							Toast.makeText(mContext, "Problem deleting file.", Toast.LENGTH_LONG).show();
+						}
+					break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+					break;
+				}
+			}
+		};
+		deleteDialogBuilder = new AlertDialog.Builder(mContext);
+		deleteDialogBuilder.setMessage("Are you sure you want to delete this file?");
+		deleteDialogBuilder.setPositiveButton("Yes", deleteDialog);
+		deleteDialogBuilder.setNegativeButton("No", deleteDialog);
+		deleteDialogBuilder.show();
+	}
+
 	private void close() {
 		if (mChecklist.isModified()) {
-			if (mCloseDialog == null || mCloseDialogBuilder == null) {
-				mCloseDialog = new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which) {
-							case DialogInterface.BUTTON_POSITIVE:
-								if (save()) {
-									finish();
-								}
-							break;
-							case DialogInterface.BUTTON_NEGATIVE:
+			AlertDialog.Builder closeDialogBuilder;
+			DialogInterface.OnClickListener closeDialog;
+
+			closeDialog = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					switch (which) {
+						case DialogInterface.BUTTON_POSITIVE:
+							if (save()) {
 								finish();
-							break;
-							case DialogInterface.BUTTON_NEUTRAL:
-							break;
-						}
+							}
+						break;
+						case DialogInterface.BUTTON_NEGATIVE:
+							finish();
+						break;
+						case DialogInterface.BUTTON_NEUTRAL:
+						break;
 					}
-				};
-				mCloseDialogBuilder = new AlertDialog.Builder(mContext);
-				mCloseDialogBuilder.setMessage("Do you want to save this file before closing?");
-				mCloseDialogBuilder.setPositiveButton("Yes", mCloseDialog);
-				mCloseDialogBuilder.setNegativeButton("No", mCloseDialog);
-				mCloseDialogBuilder.setNeutralButton("Cancel", mCloseDialog);
-			}
-			mCloseDialogBuilder.show();
+				}
+			};
+			closeDialogBuilder = new AlertDialog.Builder(mContext);
+			closeDialogBuilder.setMessage("Do you want to save this file before closing?");
+			closeDialogBuilder.setPositiveButton("Yes", closeDialog);
+			closeDialogBuilder.setNegativeButton("No", closeDialog);
+			closeDialogBuilder.setNeutralButton("Cancel", closeDialog);
+			closeDialogBuilder.show();
 		} else {
 			finish();
 		}
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		switch (keyCode) {
-			case KeyEvent.KEYCODE_BACK:
-				close();
-			break;
-		}
-		return super.onKeyDown(keyCode, event);
-	}
-
-	private boolean save() {
-		String fileName = mChecklistNameField.getText().toString().trim();
-
-		if (!isFilenameValid(fileName)) {
-			Toast.makeText(mContext, "The list name is not valid.", Toast.LENGTH_LONG).show();
-			return false;
-		}
-
-		mChecklist.setTitle(fileName);
-		try {
-			mChecklist.toFile();
-			Toast.makeText(mContext, "List saved.", Toast.LENGTH_SHORT).show();
-			return true;
-		} catch (IOException e) {
-			Toast.makeText(mContext, "Problem saving file.", Toast.LENGTH_SHORT).show();
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	public static boolean isFilenameValid(String fileName) {
-		// TODO check filename
-		return true;
 	}
 
 	private TouchInterceptor.DropListener mDropListener = new TouchInterceptor.DropListener() {
@@ -351,6 +388,5 @@ public class EditChecklist extends SherlockActivity {
 			}
 		}
 	};
-	private AlertDialog.Builder mCloseDialogBuilder;
-	private AlertDialog.Builder mDeleteDialogBuilder;
+
 }

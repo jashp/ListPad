@@ -28,7 +28,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.jpqr.listpad.R;
-import com.jpqr.listpad.activities.EditChecklist;
+import com.jpqr.listpad.activities.EditActivity;
 import com.jpqr.listpad.adapters.FileListAdapter;
 import com.jpqr.listpad.models.Checklist;
 
@@ -220,7 +220,7 @@ public class FileExplorerFragment extends SherlockFragment {
 
 	private void open(File file) {
 		if (file.isFile()) {
-			EditChecklist.newInstance(mContext, file.getAbsolutePath());
+			EditActivity.newInstance(mContext, file.getAbsolutePath());
 		} else if (file.isDirectory()) {
 			mForwardStack.clear();
 			mFile = file;

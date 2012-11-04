@@ -24,7 +24,7 @@
         </activity>
 
         <activity
-            android:name=".activities.EditChecklist"
+            android:name=".activities.EditActivity"
             android:label="Edit"
             android:windowSoftInputMode="stateHidden" >
             <intent-filter>
