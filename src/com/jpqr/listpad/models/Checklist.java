@@ -20,9 +20,9 @@ public class Checklist extends ArrayList<String> {
 	private String mDelimiter = "\n";
 	private String mOriginalText;
 
-	public Checklist() {
+	public Checklist(String path) {
 		this.mTitle = "";
-		this.mFile = new File(DEFAULT_DIRECTORY, "untitled.txt");
+		this.mFile = new File(path, "untitled.txt");
 	}
 
 	public Checklist(File file) throws IOException, FileNotFoundException {
@@ -39,7 +39,7 @@ public class Checklist extends ArrayList<String> {
 		mOriginalText = toString();
 	}
 	
-	public void toFile() throws IOException {
+	public void saveFile() throws IOException {
 		if (!mTitle.equals(mFile.getName())) {
 			File newFile = new File(mFile.getParentFile().getPath(), mTitle);
 			mFile.renameTo(newFile);

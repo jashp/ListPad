@@ -15,9 +15,13 @@
  */
 package com.jpqr.listpad.activities;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -33,6 +37,8 @@ import com.jpqr.listpad.R;
 import com.jpqr.listpad.database.FilesDataSource;
 import com.jpqr.listpad.fragments.FileExplorerFragment;
 import com.jpqr.listpad.fragments.ListFilesFragment;
+import com.jpqr.listpad.managers.SharedPreferencesManager;
+import com.jpqr.listpad.models.Checklist;
 
 /**
  * Demonstrates combining a TabHost with a ViewPager to implement a tab UI that
@@ -46,9 +52,11 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-//		setTheme(SampleList.THEME); //Used for theme switching in samples
+		// setTheme(SampleList.THEME); //Used for theme switching in samples
 		super.onCreate(savedInstanceState);
-
+		if (SharedPreferencesManager.getInstance().isFirstRun()) {
+			firstRun();
+		}
 		setContentView(R.layout.fragment_tabs_pager);
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
 		mTabHost.setup();
@@ -67,19 +75,58 @@ public class MainActivity extends SherlockFragmentActivity {
 		recent.putInt(ListFilesFragment.ARG_TYPE, FilesDataSource.Type.RECENT);
 		mTabsAdapter.addTab(mTabHost.newTabSpec("recent").setIndicator("Recent"), ListFilesFragment.class, recent);
 
-		
-		
 		if (savedInstanceState != null) {
 			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
 		}
+
 	}
+
+	private void firstRun() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		DialogInterface.OnClickListener dialog = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which) {
+					case DialogInterface.BUTTON_POSITIVE:
+						String path = Checklist.DEFAULT_DIRECTORY + "/ListPad/";
+						File dir = new File(path);
+						if (!dir.isDirectory()) {
+							if (dir.mkdirs()) {
+								try {
+									Checklist sample = new Checklist(path);
+									sample.setTitle("groceries.txt");
+									sample.add("milk");
+									sample.add("eggs");
+									sample.add("bread");
+									sample.add("ice cream");
+									sample.add("apples");
+									sample.add("bananas");
+									sample.saveFile();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+						
+					break;
+				}
+			}
+
+		};
+		builder.setPositiveButton("Yes", dialog);
+		builder.setNegativeButton("No", dialog);
+		builder.setTitle("Welcome to ListPad!");
+		builder.setMessage("Would you like to create a ListPad folder on your SD card with a sample list? (You can delete it after)");
+		builder.show();
+		SharedPreferencesManager.getInstance().setFirstRun(false);
+	}
+	
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putString("tab", mTabHost.getCurrentTabTag());
 	}
-	
 
 	/**
 	 * This is a helper class that implements the management of tabs and all

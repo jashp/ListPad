@@ -286,7 +286,7 @@ public class EditActivity extends SherlockActivity {
 
 		mChecklist.setTitle(fileName);
 		try {
-			mChecklist.toFile();
+			mChecklist.saveFile();
 			Toast.makeText(mContext, "List saved.", Toast.LENGTH_SHORT).show();
 			return true;
 		} catch (IOException e) {

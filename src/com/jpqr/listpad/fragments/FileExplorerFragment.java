@@ -30,6 +30,7 @@ import com.actionbarsherlock.view.Menu;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.activities.EditActivity;
 import com.jpqr.listpad.adapters.FileListAdapter;
+import com.jpqr.listpad.managers.SharedPreferencesManager;
 import com.jpqr.listpad.models.Checklist;
 
 public class FileExplorerFragment extends SherlockFragment {
@@ -51,7 +52,7 @@ public class FileExplorerFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mContext = getActivity();
-		mFile = new File(Checklist.DEFAULT_DIRECTORY);
+		mFile = new File(SharedPreferencesManager.getInstance().getLastLocation());
 		mFiles = new ArrayList<File>();
 		mAdapter = new FileListAdapter(mContext, mFiles);
 		mForwardStack = new Stack<File>();
@@ -101,6 +102,18 @@ public class FileExplorerFragment extends SherlockFragment {
 	}
 
 	@Override
+	public void onResume() {
+		updateDir();
+		super.onResume();
+	}
+
+	@Override
+	public void onPause() {
+		SharedPreferencesManager.getInstance().setLastLocation(mFile.getAbsolutePath());
+		super.onPause();
+	}
+
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 		if (view.getId() == R.id.list_files) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
@@ -126,12 +139,6 @@ public class FileExplorerFragment extends SherlockFragment {
 			break;
 		}
 		return super.onContextItemSelected(item);
-	}
-
-	@Override
-	public void onResume() {
-		updateDir();
-		super.onResume();
 	}
 
 	private void updateEmptyText() {

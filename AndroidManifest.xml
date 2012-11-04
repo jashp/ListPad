@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".ListPadApplication"
         android:icon="@drawable/ic_launcher"
         android:label="ListPad"
         android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >

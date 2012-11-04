@@ -71,24 +71,6 @@ public class FolderFragment extends SherlockFragment {
 	private void refreshChecklists() {
 		File dir = new File(Checklist.DEFAULT_DIRECTORY);
 
-		if (!dir.isDirectory()) {
-			boolean bool = dir.mkdirs();
-
-			try {
-				Checklist sample = new Checklist();
-				sample.setTitle("groceries sample.txt");
-				sample.add("milk");
-				sample.add("eggs");
-				sample.add("bread");
-				sample.add("ice cream");
-				sample.add("apples");
-				sample.add("bananas");
-				sample.toFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
 		mFiles.clear();
 		mFiles.addAll(getAllFiles(dir));
 		Collections.sort(mFiles, new Comparator<File>() {
