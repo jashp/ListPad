@@ -225,7 +225,7 @@ public class FileExplorerFragment extends SherlockFragment {
 		}
 	}
 
-	private void open(File file) {
+	public void open(File file) {
 		if (file.isFile()) {
 			EditActivity.newInstance(mContext, file.getAbsolutePath());
 		} else if (file.isDirectory()) {
@@ -234,4 +234,5 @@ public class FileExplorerFragment extends SherlockFragment {
 			updateDir();
 		}
 	}
+
 }
