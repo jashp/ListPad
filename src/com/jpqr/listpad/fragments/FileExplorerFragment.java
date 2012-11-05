@@ -141,11 +141,38 @@ public class FileExplorerFragment extends SherlockFragment {
 				open(file);
 			break;
 			case 1:
-				file.delete();
-				updateDir();
+				delete(file);
 			break;
 		}
 		return super.onContextItemSelected(item);
+	}
+
+	private void delete(final File file) {
+		if (file.isDirectory() && file.listFiles().length != 0) {
+			Toast.makeText(mContext, "Please empty the directory before you delete it.", Toast.LENGTH_LONG).show();
+		} else {
+			AlertDialog.Builder deleteDialogBuilder;
+			DialogInterface.OnClickListener deleteDialog;
+
+			deleteDialog = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					switch (which) {
+						case DialogInterface.BUTTON_POSITIVE:
+							file.delete();
+							updateDir();
+						break;
+					}
+				}
+			};
+			deleteDialogBuilder = new AlertDialog.Builder(mContext);
+			deleteDialogBuilder.setTitle(file.getName());
+			deleteDialogBuilder.setMessage("Are you sure you want to delete " + file.getName() + "? This action cannot be undone.");
+			deleteDialogBuilder.setPositiveButton("Yes", deleteDialog);
+			deleteDialogBuilder.setNegativeButton("No", deleteDialog);
+			deleteDialogBuilder.show();
+		}
+
 	}
 
 	private void updateEmptyText() {
