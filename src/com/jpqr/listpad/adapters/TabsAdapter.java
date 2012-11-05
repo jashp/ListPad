@@ -17,20 +17,7 @@ public class TabsAdapter extends FragmentPagerAdapter implements TabHost.OnTabCh
 	private final Context mContext;
 	private final TabHost mTabHost;
 	private final ViewPager mViewPager;
-	private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
 	private final ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
-
-	static final class TabInfo {
-		private final String tag;
-		private final Class<?> clss;
-		private final Bundle args;
-
-		TabInfo(String _tag, Class<?> _class, Bundle _args) {
-			tag = _tag;
-			clss = _class;
-			args = _args;
-		}
-	}
 
 	static class DummyTabFactory implements TabHost.TabContentFactory {
 		private final Context mContext;
@@ -58,20 +45,16 @@ public class TabsAdapter extends FragmentPagerAdapter implements TabHost.OnTabCh
 		mViewPager.setOnPageChangeListener(this);
 	}
 
-	public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args) {
+	public void addTab(TabHost.TabSpec tabSpec, Class<?> fragemntClass, Bundle args) {
 		tabSpec.setContent(new DummyTabFactory(mContext));
-		String tag = tabSpec.getTag();
-
-		TabInfo info = new TabInfo(tag, clss, args);
-		mTabs.add(info);
-		mFragments.add(Fragment.instantiate(mContext, info.clss.getName(), info.args));
+		mFragments.add(Fragment.instantiate(mContext, fragemntClass.getName(), args));
 		mTabHost.addTab(tabSpec);
 		notifyDataSetChanged();
 	}
 
 	@Override
 	public int getCount() {
-		return mTabs.size();
+		return mFragments.size();
 	}
 
 	@Override

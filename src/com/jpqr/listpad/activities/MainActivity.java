@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.jpqr.listpad.activities;
 
 import java.io.File;
@@ -33,11 +18,7 @@ import com.jpqr.listpad.fragments.ListFilesFragment;
 import com.jpqr.listpad.managers.SharedPreferencesManager;
 import com.jpqr.listpad.models.Checklist;
 
-/**
- * Demonstrates combining a TabHost with a ViewPager to implement a tab UI that
- * switches between tabs and also allows the user to perform horizontal flicks
- * to move between the tabs.
- */
+
 public class MainActivity extends SherlockFragmentActivity {
 	TabHost mTabHost;
 	ViewPager mViewPager;
@@ -46,11 +27,10 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// setTheme(SampleList.THEME); //Used for theme switching in samples
 		super.onCreate(savedInstanceState);
-//		if (SharedPreferencesManager.getInstance().isFirstRun()) {
+		if (SharedPreferencesManager.getInstance().isFirstRun()) {
 			firstRun();
-//		}
+		}
 		setContentView(R.layout.fragment_tabs_pager);
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
 		mTabHost.setup();
@@ -74,7 +54,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		}
 		
 		mFileExplorer = (FileExplorerFragment) mTabsAdapter.getItem(0);
-
 	}
 
 	private void firstRun() {
