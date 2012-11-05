@@ -1,7 +1,6 @@
 package com.jpqr.listpad.fragments;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,42 +19,39 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.activities.EditActivity;
 import com.jpqr.listpad.adapters.FileListAdapter;
-import com.jpqr.listpad.models.Checklist;
-
+import com.jpqr.listpad.helper.ReadWriteHelper;
 
 public class FolderFragment extends SherlockFragment {
 	private ArrayList<File> mFiles = new ArrayList<File>();
 	private ListView mListView;
 	private ArrayAdapter<File> mAdapter;
 
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.list_files_fragment, container, false);
 		mListView = (ListView) view.findViewById(R.id.list_files);
 		mAdapter = new FileListAdapter(getActivity(), mFiles);
-		
+
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				EditActivity.newInstance(getActivity(), mFiles.get(position).getAbsolutePath());
 			}
-		});		
+		});
 		return view;
 	}
-
 
 	@Override
 	public void onResume() {
 		super.onResume();
 		refreshChecklists();
 	}
-	
+
 	private ArrayList<File> getAllFiles(File dir) {
 		ArrayList<File> allFiles = new ArrayList<File>();
 		File[] children = dir.listFiles();
-		
+
 		for (File child : children) {
 			if (child.isDirectory()) {
 				allFiles.addAll(getAllFiles(child));
@@ -63,13 +59,12 @@ public class FolderFragment extends SherlockFragment {
 				allFiles.add(child);
 			}
 		}
-		
+
 		return allFiles;
 	}
 
-
 	private void refreshChecklists() {
-		File dir = new File(Checklist.DEFAULT_DIRECTORY);
+		File dir = new File(ReadWriteHelper.DEFAULT_DIRECTORY);
 
 		mFiles.clear();
 		mFiles.addAll(getAllFiles(dir));
@@ -91,7 +86,5 @@ public class FolderFragment extends SherlockFragment {
 			return false;
 		}
 	}
-
-
 
 }

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-import com.jpqr.listpad.models.Checklist;
+import com.jpqr.listpad.helper.ReadWriteHelper;
 
 public class SharedPreferencesManager {
 
@@ -52,7 +52,7 @@ public class SharedPreferencesManager {
 	}
 
 	public String getLastLocation() {
-		return mSharedPreferences.getString(SharedPrefsKeys.LAST_LOCATION, Checklist.DEFAULT_DIRECTORY);
+		return mSharedPreferences.getString(SharedPrefsKeys.LAST_LOCATION, ReadWriteHelper.DEFAULT_DIRECTORY);
 	}
 
 }

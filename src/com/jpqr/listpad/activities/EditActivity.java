@@ -36,6 +36,7 @@ import com.jpqr.listpad.R;
 import com.jpqr.listpad.adapters.ChecklistAdapter;
 import com.jpqr.listpad.database.FilesDataSource;
 import com.jpqr.listpad.dragdrop.TouchInterceptor;
+import com.jpqr.listpad.helper.ReadWriteHelper;
 import com.jpqr.listpad.models.Checklist;
 
 public class EditActivity extends SherlockActivity {
@@ -294,8 +295,8 @@ public class EditActivity extends SherlockActivity {
 	private boolean save() {
 		String fileName = mChecklistNameField.getText().toString().trim();
 
-		if (!Checklist.isFileNameValid(fileName)) {
-			Toast.makeText(mContext, "The list name is not valid.", Toast.LENGTH_LONG).show();
+		if (!ReadWriteHelper.isFileNameValid(fileName)) {
+			Toast.makeText(mContext, "Invalid file name.", Toast.LENGTH_LONG).show();
 			return false;
 		}
 

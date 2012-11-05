@@ -16,6 +16,7 @@ import com.jpqr.listpad.adapters.TabsAdapter;
 import com.jpqr.listpad.database.FilesDataSource;
 import com.jpqr.listpad.fragments.FileExplorerFragment;
 import com.jpqr.listpad.fragments.ListFilesFragment;
+import com.jpqr.listpad.helper.ReadWriteHelper;
 import com.jpqr.listpad.managers.SharedPreferencesManager;
 import com.jpqr.listpad.models.Checklist;
 
@@ -63,7 +64,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which) {
 					case DialogInterface.BUTTON_POSITIVE:
-						String path = Checklist.DEFAULT_DIRECTORY + "/ListPad/";
+						String path = ReadWriteHelper.DEFAULT_DIRECTORY + "/ListPad/";
 						File sampleDir = new File(path);
 						if (!sampleDir.isDirectory()) {
 							if (sampleDir.mkdirs()) {

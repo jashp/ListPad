@@ -101,13 +101,4 @@ public class Checklist extends ArrayList<String> {
 	}
 	
 
-	public static boolean isFileNameValid(String fileName) {
-		// TODO check filename
-		return true;
-	}
-	
-	public static boolean isFolderNameValid(String fileName) {
-		// TODO check filename
-		return true;
-	}
 }

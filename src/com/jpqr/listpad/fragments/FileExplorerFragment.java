@@ -32,6 +32,7 @@ import com.actionbarsherlock.view.Menu;
 import com.jpqr.listpad.R;
 import com.jpqr.listpad.activities.EditActivity;
 import com.jpqr.listpad.adapters.FileListAdapter;
+import com.jpqr.listpad.helper.ReadWriteHelper;
 import com.jpqr.listpad.managers.SharedPreferencesManager;
 import com.jpqr.listpad.models.Checklist;
 
@@ -64,8 +65,7 @@ public class FileExplorerFragment extends SherlockFragment {
 		View view = inflater.inflate(R.layout.file_picker, container, false);
 		View newFileView = inflater.inflate(R.layout.new_file_dialog, container, false);
 		createNewFileDialog(newFileView);
-		
-		
+
 		mLabel = (TextView) view.findViewById(R.id.current_dir_label);
 		mEmptyText = view.findViewById(R.id.empty_text);
 
@@ -157,7 +157,7 @@ public class FileExplorerFragment extends SherlockFragment {
 	}
 
 	private void updateDir() {
-		mLabel.setText(mFile.getAbsolutePath().replaceFirst(".*" + Checklist.DEFAULT_DIRECTORY, "/sdcard"));
+		mLabel.setText(mFile.getAbsolutePath().replaceFirst(".*" + ReadWriteHelper.DEFAULT_DIRECTORY, "/sdcard"));
 		mFiles.clear();
 
 		File[] dirs = mFile.listFiles(new FileFilter() {
@@ -183,7 +183,7 @@ public class FileExplorerFragment extends SherlockFragment {
 		mAdapter.notifyDataSetChanged();
 		updateEmptyText();
 	}
-	
+
 	private void createNewFileDialog(View newFileView) {
 		AlertDialog.Builder mNewFileDialogBuilder = new AlertDialog.Builder(mContext);
 		mNewFileDialogBuilder.setView(newFileView);
@@ -192,10 +192,10 @@ public class FileExplorerFragment extends SherlockFragment {
 		mNewFileDialogBuilder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
-				String name = mNewFileName.getText().toString();
-				switch (spinner.getSelectedItemPosition()) {
-					case 0:
-						if (Checklist.isFileNameValid(name)) {
+				String name = mNewFileName.getText().toString().trim();
+				if (ReadWriteHelper.isFileNameValid(name)) {
+					switch (spinner.getSelectedItemPosition()) {
+						case 0:
 							if (!name.contains(".")) {
 								name += ".txt";
 							}
@@ -206,19 +206,16 @@ public class FileExplorerFragment extends SherlockFragment {
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
-						} else {
-							Toast.makeText(mContext, "Invalid file name.", Toast.LENGTH_SHORT).show();
-						}
-					break;
-					case 1:
-						if (Checklist.isFolderNameValid(name)) {
-							File newFile = new File(mFile, name);
-							newFile.mkdirs();
-							open(newFile);
-						} else {
-							Toast.makeText(mContext, "Invalid folder name.", Toast.LENGTH_SHORT).show();
-						}
-					break;
+
+						break;
+						case 1:
+							File newFolder = new File(mFile, name);
+							newFolder.mkdirs();
+							open(newFolder);
+						break;
+					}
+				} else {
+					Toast.makeText(mContext, "Invalid file name.", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -238,7 +235,7 @@ public class FileExplorerFragment extends SherlockFragment {
 
 	public boolean back() {
 		File parent = mFile.getParentFile();
-		if (parent != null && !mFile.getAbsolutePath().equals(Checklist.DEFAULT_DIRECTORY)) {
+		if (parent != null && !mFile.getAbsolutePath().equals(ReadWriteHelper.DEFAULT_DIRECTORY)) {
 			mForwardStack.push(mFile);
 			mFile = parent;
 			updateDir();
