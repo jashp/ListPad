@@ -40,6 +40,7 @@ import com.jpqr.listpad.models.Checklist;
 
 public class EditActivity extends SherlockActivity {
 	public static final String EXTRA_PATH = "PATH";
+	public static final String EXTRA_SAVED_TEXT = "SAVED_TEXT";
 	private ChecklistAdapter mAdapter;
 	private Checklist mChecklist;
 	private ListView mListView;
@@ -51,6 +52,7 @@ public class EditActivity extends SherlockActivity {
 	private String mPath;
 	private FilesDataSource mDataSource;
 	private EditText mAddItemField;
+	private String mSavedText = null;
 
 	public static void newInstance(Context context, String path) {
 		Intent intent = new Intent(context, EditActivity.class);
@@ -63,6 +65,10 @@ public class EditActivity extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 		mDataSource = new FilesDataSource(mContext);
+		
+		if (savedInstanceState != null) {
+			mSavedText = savedInstanceState.getString(EXTRA_SAVED_TEXT);
+		}
 
 		Uri pathUri = getIntent().getData();
 		String pathString = getIntent().getStringExtra(EXTRA_PATH);
@@ -80,6 +86,12 @@ public class EditActivity extends SherlockActivity {
 			e.printStackTrace();
 		}
 		checkFile(file);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString(EXTRA_SAVED_TEXT, mChecklist.toString());
 	}
 
 	@Override
@@ -175,6 +187,9 @@ public class EditActivity extends SherlockActivity {
 		} catch (IOException e) {
 			Toast.makeText(mContext, "Input/output problem.", Toast.LENGTH_LONG).show();
 			e.printStackTrace();
+		}
+		if (mSavedText != null) {
+			mChecklist.fromString(mSavedText);
 		}
 		mPath = file.getAbsolutePath();
 		mDataSource.open();
