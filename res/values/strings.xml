@@ -7,6 +7,10 @@
     <string name="favourite">Favorite</string>
     <string name="recent">Recent</string>
     <string name="browse">Browse</string>
-    
+
+    <string-array name="file_folder">
+        <item>Create New File</item>
+        <item>Create New Folder</item>
+    </string-array>
 
 </resources>

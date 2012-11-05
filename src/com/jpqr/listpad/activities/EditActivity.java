@@ -279,7 +279,7 @@ public class EditActivity extends SherlockActivity {
 	private boolean save() {
 		String fileName = mChecklistNameField.getText().toString().trim();
 
-		if (!Checklist.isFilenameValid(fileName)) {
+		if (!Checklist.isFileNameValid(fileName)) {
 			Toast.makeText(mContext, "The list name is not valid.", Toast.LENGTH_LONG).show();
 			return false;
 		}

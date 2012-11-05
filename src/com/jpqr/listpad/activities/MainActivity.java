@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.widget.TabHost;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -18,12 +19,11 @@ import com.jpqr.listpad.fragments.ListFilesFragment;
 import com.jpqr.listpad.managers.SharedPreferencesManager;
 import com.jpqr.listpad.models.Checklist;
 
-
 public class MainActivity extends SherlockFragmentActivity {
 	TabHost mTabHost;
 	ViewPager mViewPager;
 	TabsAdapter mTabsAdapter;
-	FileExplorerFragment mFileExplorer; 
+	FileExplorerFragment mFileExplorer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +52,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		if (savedInstanceState != null) {
 			mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
 		}
-		
+
 		mFileExplorer = (FileExplorerFragment) mTabsAdapter.getItem(0);
 	}
 
@@ -95,11 +95,19 @@ public class MainActivity extends SherlockFragmentActivity {
 		builder.show();
 		SharedPreferencesManager.getInstance().setFirstRun(false);
 	}
-	
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putString("tab", mTabHost.getCurrentTabTag());
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && mTabHost.getCurrentTab() == 0) {
+			return mFileExplorer.back();
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
 	}
 }

@@ -23,7 +23,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -43,6 +45,8 @@ public class FileExplorerFragment extends SherlockFragment {
 	private ArrayAdapter<File> mAdapter;
 	private Stack<File> mForwardStack;
 	private View mEmptyText;
+	private AlertDialog mNewFileDialog;
+	private EditText mNewFileName;
 
 	public static void newInstance(Context context) {
 		Intent intent = new Intent(context, FileExplorerFragment.class);
@@ -58,7 +62,10 @@ public class FileExplorerFragment extends SherlockFragment {
 		mForwardStack = new Stack<File>();
 
 		View view = inflater.inflate(R.layout.file_picker, container, false);
-
+		View newFileView = inflater.inflate(R.layout.new_file_dialog, container, false);
+		createNewFileDialog(newFileView);
+		
+		
 		mLabel = (TextView) view.findViewById(R.id.current_dir_label);
 		mEmptyText = view.findViewById(R.id.empty_text);
 
@@ -150,7 +157,7 @@ public class FileExplorerFragment extends SherlockFragment {
 	}
 
 	private void updateDir() {
-		mLabel.setText(mFile.getPath());
+		mLabel.setText(mFile.getAbsolutePath().replaceFirst(".*" + Checklist.DEFAULT_DIRECTORY, "/sdcard"));
 		mFiles.clear();
 
 		File[] dirs = mFile.listFiles(new FileFilter() {
@@ -176,45 +183,68 @@ public class FileExplorerFragment extends SherlockFragment {
 		mAdapter.notifyDataSetChanged();
 		updateEmptyText();
 	}
-
-	private void newFile() {
-		AlertDialog.Builder editPrompt = new AlertDialog.Builder(mContext);
-		final EditText editText = new EditText(mContext);
-		editText.setHint("File name");
-		editPrompt.setView(editText);
-
-		editPrompt.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+	
+	private void createNewFileDialog(View newFileView) {
+		AlertDialog.Builder mNewFileDialogBuilder = new AlertDialog.Builder(mContext);
+		mNewFileDialogBuilder.setView(newFileView);
+		mNewFileName = (EditText) newFileView.findViewById(R.id.file_name);
+		final Spinner spinner = (Spinner) newFileView.findViewById(R.id.spinner_file_folder);
+		mNewFileDialogBuilder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
-				String fileName = editText.getText().toString();
-				if (!fileName.contains(".")) {
-					fileName += ".txt";
-				}
-				File newFile = new File(mFile, fileName);
-				try {
-					newFile.createNewFile();
-					open(newFile);
-				} catch (IOException e) {
-					e.printStackTrace();
+				String name = mNewFileName.getText().toString();
+				switch (spinner.getSelectedItemPosition()) {
+					case 0:
+						if (Checklist.isFileNameValid(name)) {
+							if (!name.contains(".")) {
+								name += ".txt";
+							}
+							File newFile = new File(mFile, name);
+							try {
+								newFile.createNewFile();
+								open(newFile);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						} else {
+							Toast.makeText(mContext, "Invalid file name.", Toast.LENGTH_SHORT).show();
+						}
+					break;
+					case 1:
+						if (Checklist.isFolderNameValid(name)) {
+							File newFile = new File(mFile, name);
+							newFile.mkdirs();
+							open(newFile);
+						} else {
+							Toast.makeText(mContext, "Invalid folder name.", Toast.LENGTH_SHORT).show();
+						}
+					break;
 				}
 			}
 		});
 
-		editPrompt.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		mNewFileDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 			}
 		});
-
-		editPrompt.show();
+		mNewFileDialog = mNewFileDialogBuilder.create();
 	}
 
-	private void back() {
+	private void newFile() {
+		mNewFileName.setText("");
+		mNewFileDialog.show();
+	}
+
+	public boolean back() {
 		File parent = mFile.getParentFile();
-		if (parent != null) {
+		if (parent != null && !mFile.getAbsolutePath().equals(Checklist.DEFAULT_DIRECTORY)) {
 			mForwardStack.push(mFile);
 			mFile = parent;
 			updateDir();
+			return true;
+		} else {
+			return false;
 		}
 	}
 
