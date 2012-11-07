@@ -4,8 +4,8 @@
     <dimen name="padding_medium">8dp</dimen>
     <dimen name="padding_large">16dp</dimen>
     <!-- height of a normal list item in edit playlist mode -->
-    <dimen name="normal_height">50dip</dimen>
+    <dimen name="normal_height">42dip</dimen>
     <!-- height of an expanded list item in edit playlist mode -->
-    <dimen name="expanded_height">100dip</dimen>
+    <dimen name="expanded_height">84dip</dimen>
 
 </resources>

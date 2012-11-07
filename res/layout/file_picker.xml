@@ -32,18 +32,18 @@
 
         <ImageView
             android:id="@+id/folder_back"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:src="@drawable/ic_menu_back" />
+            android:src="@drawable/ics_navigation_back" />
 
         <ImageView
             android:id="@+id/folder_forward"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_toRightOf="@+id/folder_back"
-            android:src="@drawable/ic_menu_forward" />
+            android:src="@drawable/ics_navigation_forward" />
 
         <TextView
             android:id="@+id/current_dir_label"
@@ -61,10 +61,10 @@
 
         <ImageView
             android:id="@+id/file_add"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentRight="true"
-            android:src="@drawable/ic_menu_add" />
+            android:src="@drawable/ics_content_new" />
     </RelativeLayout>
 
 </RelativeLayout>

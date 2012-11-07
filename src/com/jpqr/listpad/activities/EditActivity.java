@@ -92,7 +92,9 @@ public class EditActivity extends SherlockActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString(EXTRA_SAVED_TEXT, mChecklist.toString());
+		if (mChecklist != null) {
+			outState.putString(EXTRA_SAVED_TEXT, mChecklist.toString());
+		}
 	}
 
 	@Override
@@ -100,7 +102,7 @@ public class EditActivity extends SherlockActivity {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.edit_file_menu, menu);
 		MenuItem favouriteItem = menu.findItem(R.id.favourite);
-		favouriteItem.setIcon(mIsFavourite ? R.drawable.btn_star_big_on : R.drawable.btn_star_big_off);
+		favouriteItem.setIcon(mIsFavourite ? R.drawable.ics_rating_important : R.drawable.ics_rating_not_important);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -316,12 +318,12 @@ public class EditActivity extends SherlockActivity {
 		mDataSource.open();
 		if (mIsFavourite) {
 			mIsFavourite = false;
-			item.setIcon(R.drawable.btn_star_big_off);
+			item.setIcon(R.drawable.ics_rating_not_important);
 			mDataSource.deleteFile(mPath, FilesDataSource.Type.FAVOURITE);
 			Toast.makeText(mContext, "Unfavorited.", Toast.LENGTH_SHORT).show();
 		} else {
 			mIsFavourite = true;
-			item.setIcon(R.drawable.btn_star_big_on);
+			item.setIcon(R.drawable.ics_rating_important);
 			mDataSource.addFile(mPath, FilesDataSource.Type.FAVOURITE);
 			Toast.makeText(mContext, "Favorited.", Toast.LENGTH_SHORT).show();
 		}

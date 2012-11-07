@@ -30,9 +30,9 @@ public class FileListAdapter extends ArrayAdapter<File> {
 		File file = mFiles.get(position);
 		ImageView itemIcon = (ImageView) view.findViewById(R.id.file_icon);
 		if (file.isDirectory()) {
-			itemIcon.setImageResource(R.drawable.ic_menu_archive);
+			itemIcon.setImageResource(R.drawable.ics_collections_collection);
 		} else if (file.isFile()) {
-			itemIcon.setImageResource(R.drawable.ic_menu_agenda);
+			itemIcon.setImageResource(R.drawable.ics_collections_view_as_list);
 		}
 		TextView itemName = (TextView) view.findViewById(R.id.file_name);
 		itemName.setText(file.getName());

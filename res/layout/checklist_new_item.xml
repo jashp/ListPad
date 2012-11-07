@@ -9,17 +9,18 @@
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center_vertical" >
+        android:layout_height="42dp"
+        android:gravity="center_vertical" 
+        android:padding="5dp">
 
         <ImageView
             android:id="@+id/add_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:src="@drawable/ic_menu_add" />
+            android:src="@drawable/ics_navigation_accept" />
 
         <EditText
             android:id="@+id/add_item_field"
@@ -31,7 +32,8 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/add_button"
             android:imeOptions="actionNext"
-            android:singleLine="true" />
+            android:singleLine="true" android:paddingRight="5dp"
+            />
     </RelativeLayout>
 
 </LinearLayout>
