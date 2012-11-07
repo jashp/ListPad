@@ -82,10 +82,10 @@ public class ListFilesFragment extends SherlockFragment {
 			menu.setHeaderTitle(mFiles.get(info.position).getName());
 			switch (mType) {
 				case FilesDataSource.Type.FAVOURITE:
-					menu.add("Remove from favorites.");
+					menu.add("Remove from favorites");
 				break;
 				case FilesDataSource.Type.RECENT:
-					menu.add("Remove from recent.");
+					menu.add("Remove from recent");
 				break;
 			}
 		}
